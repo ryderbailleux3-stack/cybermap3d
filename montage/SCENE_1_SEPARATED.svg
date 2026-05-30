@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  
+  <!-- FOND OCÉAN -->
+  <rect id="ocean_haut" x="0" y="0" width="1920" height="500" fill="#2E7D9D"/>
+  <rect id="ocean_milieu" x="0" y="500" width="1920" height="200" fill="#1B4965"/>
+  <rect id="ocean_bas" x="0" y="700" width="1920" height="380" fill="#0a2d2d"/>
+  
+  <!-- ROCHERS -->
+  <path id="rochers" d="M 0 700 L 150 650 L 300 700 L 450 680 L 600 720 L 750 700 L 900 680 L 1050 700 L 1200 690 L 1350 710 L 1500 700 L 1650 680 L 1800 700 L 1920 690 L 1920 1080 L 0 1080 Z" fill="#1a3a3a"/>
+  
+  <!-- ============================================ -->
+  <!-- ALGUE 1 - GAUCHE -->
+  <!-- ============================================ -->
+  <g id="algue_1" class="algue">
+    <ellipse cx="200" cy="850" rx="120" ry="150" fill="#2D6A4F"/>
+    <ellipse cx="180" cy="820" rx="90" ry="120" fill="#3DB55F"/>
+  </g>
+  
+  <!-- ============================================ -->
+  <!-- ALGUE 2 - CENTRE-GAUCHE -->
+  <!-- ============================================ -->
+  <g id="algue_2" class="algue">
+    <ellipse cx="450" cy="900" rx="100" ry="140" fill="#3DB55F"/>
+    <ellipse cx="470" cy="870" rx="80" ry="110" fill="#2D6A4F"/>
+  </g>
+  
+  <!-- ============================================ -->
+  <!-- ALGUE 3 - CENTRE (GRANDE) -->
+  <!-- ============================================ -->
+  <g id="algue_3" class="algue">
+    <ellipse cx="750" cy="880" rx="130" ry="160" fill="#3DB55F"/>
+    <ellipse cx="730" cy="850" rx="100" ry="130" fill="#2D6A4F"/>
+  </g>
+  
+  <!-- ============================================ -->
+  <!-- ALGUE 4 - CENTRE-DROIT -->
+  <!-- ============================================ -->
+  <g id="algue_4" class="algue">
+    <ellipse cx="1100" cy="870" rx="110" ry="145" fill="#2D6A4F"/>
+    <ellipse cx="1120" cy="840" rx="85" ry="115" fill="#3DB55F"/>
+  </g>
+  
+  <!-- ============================================ -->
+  <!-- ALGUE 5 - DROIT (GRANDE) -->
+  <!-- ============================================ -->
+  <g id="algue_5" class="algue">
+    <ellipse cx="1450" cy="840" rx="125" ry="155" fill="#3DB55F"/>
+    <ellipse cx="1430" cy="810" rx="95" ry="125" fill="#2D6A4F"/>
+  </g>
+  
+  <!-- ============================================ -->
+  <!-- ALGUE 6 - LOIN À DROITE -->
+  <!-- ============================================ -->
+  <g id="algue_6" class="algue">
+    <ellipse cx="1700" cy="900" rx="100" ry="135" fill="#2D6A4F"/>
+    <ellipse cx="1720" cy="870" rx="75" ry="105" fill="#3DB55F"/>
+  </g>
+  
+  <!-- ============================================ -->
+  <!-- BULLES -->
+  <!-- ============================================ -->
+  <circle id="bulle_1" cx="300" cy="400" r="15" fill="#4DB8E8" opacity="0.4"/>
+  <circle id="bulle_2" cx="500" cy="350" r="20" fill="#4DB8E8" opacity="0.35"/>
+  <circle id="bulle_3" cx="800" cy="500" r="12" fill="#4DB8E8" opacity="0.4"/>
+  <circle id="bulle_4" cx="1200" cy="420" r="18" fill="#4DB8E8" opacity="0.35"/>
+  <circle id="bulle_5" cx="1600" cy="480" r="14" fill="#4DB8E8" opacity="0.4"/>
+  <circle id="bulle_6" cx="1850" cy="350" r="16" fill="#4DB8E8" opacity="0.35"/>
+  
+  <!-- ============================================ -->
+  <!-- TEXTE PRINCIPAL -->
+  <!-- ============================================ -->
+  <text id="titre_etouffement" x="960" y="280" font-family="Arial, Helvetica, sans-serif" font-size="140" font-weight="bold" text-anchor="middle" fill="#D8347B">
+    ÉTOUFFEMENT
+  </text>
+
+</svg>

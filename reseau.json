@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "nom": "PC-Bureau",
+        "ip": "192.168.1.10",
+        "type": "pc",
+        "infecte": true
+    },
+    {
+        "id": 2,
+        "nom": "Serveur-Web",
+        "ip": "192.168.1.20",
+        "type": "serveur",
+        "infecte": true
+    },
+    {
+        "id": 3,
+        "nom": "Routeur",
+        "ip": "192.168.1.1",
+        "type": "routeur",
+        "infecte": true
+    },
+    {
+        "id": 4,
+        "nom": "PC-Portable",
+        "ip": "192.168.1.11",
+        "type": "pc",
+        "infecte": true
+    }
+]

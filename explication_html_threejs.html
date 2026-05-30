@@ -1,0 +1,228 @@
+
+<h2 class="sr-only">Explication du code HTML et Three.js</h2>
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.concept { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.concept-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.concept-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 10px; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.c-tag { color: #f38ba8; }
+.c-attr { color: #fab387; }
+.result { background: #11111b; border-radius: var(--border-radius-md); padding: 10px 16px; font-family: var(--font-mono); font-size: 12px; color: #a6e3a1; margin-top: 6px; line-height: 1.8; }
+.result-label { font-size: 11px; color: #6c7086; margin-bottom: 4px; font-family: var(--font-sans); }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.badge-blue { background: #E6F1FB; color: #0C447C; }
+.badge-teal { background: #E1F5EE; color: #085041; }
+.badge-amber { background: #FAEEDA; color: #633806; }
+.badge-coral { background: #FAECE7; color: #712B13; }
+.badge-purple { background: #EEEDFE; color: #3C3489; }
+.tip { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 10px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; border-radius: 0; }
+.schema { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.schema-row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.schema-box { padding: 6px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 110px; text-align: center; }
+.schema-arrow { color: var(--color-text-tertiary); font-size: 16px; }
+.schema-desc { color: var(--color-text-secondary); font-size: 12px; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('html')">HTML</button>
+    <button class="nav-btn" onclick="show('css')">CSS</button>
+    <button class="nav-btn" onclick="show('js')">JavaScript</button>
+    <button class="nav-btn" onclick="show('scene')">Scène 3D</button>
+    <button class="nav-btn" onclick="show('animation')">Animation</button>
+    <button class="nav-btn" onclick="show('lien')">Lien Python→3D</button>
+  </div>
+
+  <!-- HTML -->
+  <div class="section active" id="s-html">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-blue">Concept</span> HTML — la structure de la page</div>
+      <div class="concept-desc">HTML c'est le squelette de toute page web. Il dit au navigateur <strong>ce qui existe</strong> sur la page — un titre, une image, un bouton. Chaque élément est une balise entre <code>&lt; &gt;</code>.</div>
+      <div class="code-block">
+        <div><span class="c-tag">&lt;!DOCTYPE html&gt;</span> <span class="c-comment">  — dit que c'est une page web</span></div>
+        <div><span class="c-tag">&lt;html&gt;</span> <span class="c-comment">          — tout le contenu va ici</span></div>
+        <div><span class="c-tag">&lt;head&gt;</span> <span class="c-comment">          — infos invisibles (titre, style)</span></div>
+        <div>&nbsp;&nbsp;<span class="c-tag">&lt;title&gt;</span>CyberMap 3D<span class="c-tag">&lt;/title&gt;</span></div>
+        <div><span class="c-tag">&lt;/head&gt;</span></div>
+        <div><span class="c-tag">&lt;body&gt;</span> <span class="c-comment">          — ce que l'utilisateur voit</span></div>
+        <div>&nbsp;&nbsp;<span class="c-tag">&lt;div id=<span class="c-str">"info"</span>&gt;</span>CyberMap 3D<span class="c-tag">&lt;/div&gt;</span></div>
+        <div><span class="c-tag">&lt;/body&gt;</span></div>
+        <div><span class="c-tag">&lt;/html&gt;</span></div>
+      </div>
+      <div class="tip">Chaque balise ouvrante <code>&lt;div&gt;</code> doit avoir une balise fermante <code>&lt;/div&gt;</code>. C'est comme des parenthèses qui s'ouvrent et se ferment.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-blue">Balise script</span> Importer Three.js</div>
+      <div class="concept-desc">Three.js est une bibliothèque JavaScript qui gère toute la 3D. On l'importe depuis internet avec une balise <code>&lt;script src="..."&gt;</code> — comme un <code>import</code> en Python.</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Python</span></div>
+        <div><span class="c-kw">import</span> json</div>
+        <div style="margin-top:10px"><span class="c-comment">// JavaScript (équivalent)</span></div>
+        <div><span class="c-tag">&lt;script <span class="c-attr">src</span>=<span class="c-str">"three.min.js"</span>&gt;&lt;/script&gt;</span></div>
+      </div>
+      <div class="tip">En Python on dit <code>import</code>. En HTML on dit <code>&lt;script src&gt;</code>. C'est la même idée : charger du code externe pour s'en servir.</div>
+    </div>
+  </div>
+
+  <!-- CSS -->
+  <div class="section" id="s-css">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-teal">Concept</span> CSS — le style visuel</div>
+      <div class="concept-desc">Le CSS dit au navigateur <strong>comment ça doit avoir l'air</strong> — couleurs, tailles, positions. Sans CSS, tout serait blanc avec du texte noir.</div>
+      <div class="code-block">
+        <div><span class="c-var">*</span> {</div>
+        <div>&nbsp;&nbsp;<span class="c-attr">margin</span>: <span class="c-num">0</span>;  <span class="c-comment">   /* supprime les espaces par défaut */</span></div>
+        <div>&nbsp;&nbsp;<span class="c-attr">padding</span>: <span class="c-num">0</span>; <span class="c-comment">   /* supprime les marges internes */</span></div>
+        <div>}</div>
+        <div style="margin-top:8px"><span class="c-var">body</span> {</div>
+        <div>&nbsp;&nbsp;<span class="c-attr">background</span>: <span class="c-str">#0a0a1a</span>; <span class="c-comment">/* fond noir/bleu foncé */</span></div>
+        <div>}</div>
+        <div style="margin-top:8px"><span class="c-var">#info</span> {</div>
+        <div>&nbsp;&nbsp;<span class="c-attr">position</span>: <span class="c-str">absolute</span>; <span class="c-comment">/* flotte au-dessus */</span></div>
+        <div>&nbsp;&nbsp;<span class="c-attr">color</span>: <span class="c-str">#00ff88</span>;    <span class="c-comment">/* vert néon */</span></div>
+        <div>&nbsp;&nbsp;<span class="c-attr">font-family</span>: <span class="c-str">monospace</span>;</div>
+        <div>}</div>
+      </div>
+      <div class="tip"><code>#info</code> cible l'élément avec <code>id="info"</code>. Le <code>#</code> veut dire "l'élément avec cet id". C'est comme chercher une variable par son nom.</div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <div class="section" id="s-js">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-amber">Concept</span> JavaScript — le comportement</div>
+      <div class="concept-desc">HTML = structure, CSS = apparence, JavaScript = <strong>action</strong>. C'est le seul langage que le navigateur comprend nativement. Il ressemble beaucoup à Python.</div>
+      <div class="code-block">
+        <div><span class="c-comment">// Python vs JavaScript</span></div>
+        <div></div>
+        <div><span class="c-comment"># Python</span></div>
+        <div><span class="c-var">age</span> = <span class="c-num">17</span></div>
+        <div><span class="c-kw">if</span> <span class="c-var">age</span> > <span class="c-num">18</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">"majeur"</span>)</div>
+        <div style="margin-top:10px"><span class="c-comment">// JavaScript</span></div>
+        <div><span class="c-kw">const</span> <span class="c-var">age</span> = <span class="c-num">17</span></div>
+        <div><span class="c-kw">if</span> (<span class="c-var">age</span> > <span class="c-num">18</span>) {</div>
+        <div>&nbsp;&nbsp;<span class="c-fn">console</span>.<span class="c-fn">log</span>(<span class="c-str">"majeur"</span>)</div>
+        <div>}</div>
+      </div>
+      <div class="tip">Les différences principales : JS utilise <code>const</code>/<code>let</code> au lieu de rien, les blocs sont entre <code>{ }</code> au lieu d'indentation, et <code>console.log</code> remplace <code>print</code>.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-amber">Boucle</span> forEach — l'équivalent du for Python</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Python</span></div>
+        <div><span class="c-kw">for</span> <span class="c-var">machine</span> <span class="c-kw">in</span> <span class="c-var">machines</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-var">machine</span>[<span class="c-str">"nom"</span>])</div>
+        <div style="margin-top:10px"><span class="c-comment">// JavaScript</span></div>
+        <div><span class="c-var">machines</span>.<span class="c-fn">forEach</span>(<span class="c-var">machine</span> => {</div>
+        <div>&nbsp;&nbsp;<span class="c-fn">console</span>.<span class="c-fn">log</span>(<span class="c-var">machine</span>.<span class="c-var">nom</span>)</div>
+        <div>})</div>
+      </div>
+      <div class="tip">C'est la même logique. La flèche <code>=></code> en JS s'appelle une "fonction fléchée" — c'est l'équivalent du <code>:</code> après le <code>for</code> en Python.</div>
+    </div>
+  </div>
+
+  <!-- SCENE 3D -->
+  <div class="section" id="s-scene">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-coral">Concept</span> Les 3 éléments indispensables de Three.js</div>
+      <div class="concept-desc">Pour afficher quelque chose en 3D, Three.js a besoin de 3 choses — exactement comme un vrai tournage de film.</div>
+      <div class="schema">
+        <div class="schema-row">
+          <div class="schema-box" style="background:#E1F5EE;color:#085041">Scene</div>
+          <div class="schema-arrow">→</div>
+          <div class="schema-desc">Le <strong>plateau de tournage</strong>. Tout ce qui existe (cubes, lumières) est ajouté ici avec <code>scene.add()</code></div>
+        </div>
+        <div class="schema-row">
+          <div class="schema-box" style="background:#EEEDFE;color:#3C3489">Camera</div>
+          <div class="schema-arrow">→</div>
+          <div class="schema-desc">L'<strong>œil</strong> qui regarde la scène. On la place avec <code>camera.position.z = 10</code></div>
+        </div>
+        <div class="schema-row">
+          <div class="schema-box" style="background:#FAECE7;color:#712B13">Renderer</div>
+          <div class="schema-arrow">→</div>
+          <div class="schema-desc">Le <strong>projecteur</strong> qui dessine la scène sur l'écran à chaque frame</div>
+        </div>
+      </div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-coral">Cubes</span> Comment un cube est créé</div>
+      <div class="code-block">
+        <div><span class="c-comment">// 1 — La forme (géométrie)</span></div>
+        <div><span class="c-kw">const</span> <span class="c-var">geo</span> = <span class="c-kw">new</span> <span class="c-fn">THREE.BoxGeometry</span>(<span class="c-num">1</span>, <span class="c-num">1</span>, <span class="c-num">1</span>)</div>
+        <div style="margin-top:6px"><span class="c-comment">// 2 — La couleur (matériau)</span></div>
+        <div><span class="c-kw">const</span> <span class="c-var">mat</span> = <span class="c-kw">new</span> <span class="c-fn">THREE.MeshPhongMaterial</span>({ <span class="c-attr">color</span>: <span class="c-num">0xff2222</span> })</div>
+        <div style="margin-top:6px"><span class="c-comment">// 3 — L'objet (forme + couleur)</span></div>
+        <div><span class="c-kw">const</span> <span class="c-var">cube</span> = <span class="c-kw">new</span> <span class="c-fn">THREE.Mesh</span>(<span class="c-var">geo</span>, <span class="c-var">mat</span>)</div>
+        <div style="margin-top:6px"><span class="c-comment">// 4 — Placer dans la scène</span></div>
+        <div><span class="c-var">cube</span>.<span class="c-var">position</span>.<span class="c-fn">set</span>(<span class="c-num">-4</span>, <span class="c-num">0</span>, <span class="c-num">0</span>)</div>
+        <div><span class="c-var">scene</span>.<span class="c-fn">add</span>(<span class="c-var">cube</span>)</div>
+      </div>
+      <div class="tip"><code>0xff2222</code> c'est du rouge en hexadécimal. En CSS tu écrirais <code>#ff2222</code> — c'est la même chose, juste avec <code>0x</code> devant pour JavaScript.</div>
+    </div>
+  </div>
+
+  <!-- ANIMATION -->
+  <div class="section" id="s-animation">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-purple">Concept</span> La boucle d'animation</div>
+      <div class="concept-desc">Pour que la scène tourne, on crée une boucle infinie qui se répète <strong>60 fois par seconde</strong>. À chaque répétition on tourne un peu la scène et on la redessine.</div>
+      <div class="code-block">
+        <div><span class="c-kw">function</span> <span class="c-fn">animer</span>() {</div>
+        <div>&nbsp;&nbsp;<span class="c-fn">requestAnimationFrame</span>(<span class="c-var">animer</span>) <span class="c-comment">// rappelle animer() au prochain frame</span></div>
+        <div>&nbsp;&nbsp;<span class="c-var">scene</span>.<span class="c-var">rotation</span>.<span class="c-var">y</span> += <span class="c-num">0.005</span>  <span class="c-comment">// tourne de 0.005 radian</span></div>
+        <div>&nbsp;&nbsp;<span class="c-var">renderer</span>.<span class="c-fn">render</span>(<span class="c-var">scene</span>, <span class="c-var">camera</span>) <span class="c-comment">// redessine</span></div>
+        <div>}</div>
+        <div style="margin-top:8px"><span class="c-fn">animer</span>() <span class="c-comment">// lance la boucle</span></div>
+      </div>
+      <div class="tip"><code>requestAnimationFrame</code> c'est l'équivalent de <code>time.sleep</code> en Python mais pour les animations — il synchronise avec le rafraîchissement de l'écran (60fps).</div>
+    </div>
+  </div>
+
+  <!-- LIEN PYTHON 3D -->
+  <div class="section" id="s-lien">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-teal">Architecture</span> Comment Python et Three.js communiquent</div>
+      <div class="concept-desc">Les deux langages ne se parlent pas directement. Le <strong>fichier JSON</strong> est le messager entre eux.</div>
+      <div class="schema" style="margin: 12px 0">
+        <div class="schema-row">
+          <div class="schema-box" style="background:#EEEDFE;color:#3C3489">Python</div>
+          <div class="schema-arrow">→</div>
+          <div class="schema-desc">Simule l'attaque, génère les données du réseau</div>
+        </div>
+        <div class="schema-row">
+          <div class="schema-box" style="background:#FAEEDA;color:#633806">reseau.json</div>
+          <div class="schema-arrow">→</div>
+          <div class="schema-desc">Stocke l'état du réseau (qui est infecté, les IPs...)</div>
+        </div>
+        <div class="schema-row">
+          <div class="schema-box" style="background:#E1F5EE;color:#085041">Three.js</div>
+          <div class="schema-arrow">→</div>
+          <div class="schema-desc">Lit le JSON et place les machines en 3D avec les bonnes couleurs</div>
+        </div>
+      </div>
+      <div class="tip">C'est exactement l'architecture qu'utilisent les vrais outils de cybersécurité — un backend qui analyse, un frontend qui visualise. Tu construis quelque chose de professionnel.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

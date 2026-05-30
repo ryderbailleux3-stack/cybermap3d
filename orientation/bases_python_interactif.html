@@ -1,0 +1,262 @@
+
+<h2 class="sr-only">Cours interactif — les bases de Python</h2>
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.concept { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.concept-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.concept-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 10px; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.c-op { color: #f38ba8; }
+.result { background: #11111b; border-radius: var(--border-radius-md); padding: 10px 16px; font-family: var(--font-mono); font-size: 12px; color: #a6e3a1; margin-top: 6px; line-height: 1.8; }
+.result-label { font-size: 11px; color: #6c7086; margin-bottom: 4px; font-family: var(--font-sans); }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.badge-blue { background: #E6F1FB; color: #0C447C; }
+.badge-teal { background: #E1F5EE; color: #085041; }
+.badge-amber { background: #FAEEDA; color: #633806; }
+.badge-coral { background: #FAECE7; color: #712B13; }
+.badge-purple { background: #EEEDFE; color: #3C3489; }
+.tip { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 10px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; border-radius: 0; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('variables')">Variables</button>
+    <button class="nav-btn" onclick="show('types')">Types</button>
+    <button class="nav-btn" onclick="show('listes')">Listes</button>
+    <button class="nav-btn" onclick="show('conditions')">Conditions</button>
+    <button class="nav-btn" onclick="show('boucles')">Boucles</button>
+    <button class="nav-btn" onclick="show('fonctions')">Fonctions</button>
+    <button class="nav-btn" onclick="show('dicos')">Dictionnaires</button>
+  </div>
+
+  <!-- VARIABLES -->
+  <div class="section active" id="s-variables">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-blue">Concept</span> Une variable, c'est quoi ?</div>
+      <div class="concept-desc">Une variable est une <strong>boîte</strong> dans la mémoire de l'ordinateur. Tu lui donnes un nom, tu y mets une valeur. Tu peux la lire ou la modifier à tout moment.</div>
+      <div class="code-block">
+        <div><span class="c-var">prenom</span> = <span class="c-str">"Hugo"</span></div>
+        <div><span class="c-var">age</span> = <span class="c-num">17</span></div>
+        <div><span class="c-var">note</span> = <span class="c-num">15.5</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">prenom</span>)</div>
+      </div>
+      <div class="result"><div class="result-label">résultat :</div>Hugo</div>
+      <div class="tip">Le signe <code>=</code> ne veut pas dire "égal" en Python. Il veut dire "met la valeur de droite dans la boîte de gauche".</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-blue">Règles</span> Nommer une variable</div>
+      <div class="concept-desc">Les noms de variables suivent 3 règles simples.</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Valide</span></div>
+        <div><span class="c-var">mon_age</span> = <span class="c-num">17</span></div>
+        <div><span class="c-var">nomUtilisateur</span> = <span class="c-str">"Hugo"</span></div>
+        <div><span class="c-var">score2</span> = <span class="c-num">100</span></div>
+        <div style="margin-top:8px"><span class="c-comment"># Invalide</span></div>
+        <div><span class="c-op">2score</span> = <span class="c-num">100</span> &nbsp;<span class="c-comment"># commence par un chiffre</span></div>
+        <div><span class="c-op">mon age</span> = <span class="c-num">17</span> &nbsp;<span class="c-comment"># espace interdit</span></div>
+      </div>
+      <div class="tip">Convention en Python : on utilise <code>les_underscores</code> pour séparer les mots. Ex : <code>nom_machine</code>, <code>vitesse_max</code>.</div>
+    </div>
+  </div>
+
+  <!-- TYPES -->
+  <div class="section" id="s-types">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-teal">Concept</span> Les types de données</div>
+      <div class="concept-desc">Chaque variable a un <strong>type</strong> — la nature de ce qu'elle contient. Python en gère 4 principaux.</div>
+      <div class="code-block">
+        <div><span class="c-comment"># int — nombre entier</span></div>
+        <div><span class="c-var">age</span> = <span class="c-num">17</span></div>
+        <div style="margin-top:6px"><span class="c-comment"># float — nombre décimal</span></div>
+        <div><span class="c-var">moyenne</span> = <span class="c-num">14.75</span></div>
+        <div style="margin-top:6px"><span class="c-comment"># str — texte (string)</span></div>
+        <div><span class="c-var">prenom</span> = <span class="c-str">"Hugo"</span></div>
+        <div style="margin-top:6px"><span class="c-comment"># bool — vrai ou faux</span></div>
+        <div><span class="c-var">infecte</span> = <span class="c-kw">False</span></div>
+        <div><span class="c-var">connecte</span> = <span class="c-kw">True</span></div>
+      </div>
+      <div class="tip">Pour savoir le type d'une variable : <code>print(type(age))</code> → affiche <code>&lt;class 'int'&gt;</code></div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-teal">Opérations</span> Faire des calculs</div>
+      <div class="code-block">
+        <div><span class="c-var">a</span> = <span class="c-num">10</span></div>
+        <div><span class="c-var">b</span> = <span class="c-num">3</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">a</span> + <span class="c-var">b</span>)  &nbsp;<span class="c-comment"># addition → 13</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">a</span> - <span class="c-var">b</span>)  &nbsp;<span class="c-comment"># soustraction → 7</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">a</span> * <span class="c-var">b</span>)  &nbsp;<span class="c-comment"># multiplication → 30</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">a</span> / <span class="c-var">b</span>)  &nbsp;<span class="c-comment"># division → 3.33</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">a</span> % <span class="c-var">b</span>)  &nbsp;<span class="c-comment"># reste → 1</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">a</span> ** <span class="c-var">b</span>) <span class="c-comment"># puissance → 1000</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTES -->
+  <div class="section" id="s-listes">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-amber">Concept</span> Une liste, c'est quoi ?</div>
+      <div class="concept-desc">Une liste stocke <strong>plusieurs valeurs</strong> dans une seule variable. Les éléments sont dans l'ordre et chacun a un numéro (index) qui commence à 0.</div>
+      <div class="code-block">
+        <div><span class="c-var">fruits</span> = [<span class="c-str">"pomme"</span>, <span class="c-str">"banane"</span>, <span class="c-str">"cerise"</span>]</div>
+        <div style="margin-top:8px"><span class="c-fn">print</span>(<span class="c-var">fruits</span>[<span class="c-num">0</span>]) <span class="c-comment"># pomme</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">fruits</span>[<span class="c-num">1</span>]) <span class="c-comment"># banane</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-var">fruits</span>[<span class="c-num">2</span>]) <span class="c-comment"># cerise</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-fn">len</span>(<span class="c-var">fruits</span>)) <span class="c-comment"># 3 (taille)</span></div>
+      </div>
+      <div class="tip">L'index commence toujours à <strong>0</strong>, pas à 1. Le premier élément = index 0, le deuxième = index 1, etc.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-amber">Opérations</span> Modifier une liste</div>
+      <div class="code-block">
+        <div><span class="c-var">machines</span> = [<span class="c-str">"PC"</span>, <span class="c-str">"Serveur"</span>]</div>
+        <div style="margin-top:6px"><span class="c-var">machines</span>.<span class="c-fn">append</span>(<span class="c-str">"Routeur"</span>) <span class="c-comment"># ajouter</span></div>
+        <div><span class="c-var">machines</span>.<span class="c-fn">remove</span>(<span class="c-str">"PC"</span>)    <span class="c-comment"># supprimer</span></div>
+        <div><span class="c-var">machines</span>[<span class="c-num">0</span>] = <span class="c-str">"Laptop"</span>      <span class="c-comment"># modifier</span></div>
+        <div style="margin-top:6px"><span class="c-fn">print</span>(<span class="c-var">machines</span>)</div>
+      </div>
+      <div class="result"><div class="result-label">résultat :</div>['Laptop', 'Routeur']</div>
+    </div>
+  </div>
+
+  <!-- CONDITIONS -->
+  <div class="section" id="s-conditions">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-coral">Concept</span> if / elif / else</div>
+      <div class="concept-desc">Une condition permet à Python de <strong>choisir</strong> quoi faire selon une situation. C'est la base de toute logique en programmation.</div>
+      <div class="code-block">
+        <div><span class="c-var">note</span> = <span class="c-num">14</span></div>
+        <div style="margin-top:6px"><span class="c-kw">if</span> <span class="c-var">note</span> >= <span class="c-num">16</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">"Très bien"</span>)</div>
+        <div><span class="c-kw">elif</span> <span class="c-var">note</span> >= <span class="c-num">10</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">"Passable"</span>)</div>
+        <div><span class="c-kw">else</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">"Insuffisant"</span>)</div>
+      </div>
+      <div class="result"><div class="result-label">résultat :</div>Passable</div>
+      <div class="tip"><code>elif</code> = "sinon si". Tu peux en mettre autant que tu veux entre le <code>if</code> et le <code>else</code>.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-coral">Opérateurs</span> Comparer des valeurs</div>
+      <div class="code-block">
+        <div><span class="c-var">a</span> == <span class="c-var">b</span>  <span class="c-comment"># égal à</span></div>
+        <div><span class="c-var">a</span> != <span class="c-var">b</span>  <span class="c-comment"># différent de</span></div>
+        <div><span class="c-var">a</span> >  <span class="c-var">b</span>  <span class="c-comment"># supérieur à</span></div>
+        <div><span class="c-var">a</span> <  <span class="c-var">b</span>  <span class="c-comment"># inférieur à</span></div>
+        <div><span class="c-var">a</span> >= <span class="c-var">b</span>  <span class="c-comment"># supérieur ou égal</span></div>
+        <div><span class="c-var">a</span> <= <span class="c-var">b</span>  <span class="c-comment"># inférieur ou égal</span></div>
+        <div style="margin-top:8px"><span class="c-kw">and</span>  <span class="c-comment"># les deux doivent être vrais</span></div>
+        <div><span class="c-kw">or</span>   <span class="c-comment"># au moins un vrai</span></div>
+        <div><span class="c-kw">not</span>  <span class="c-comment"># inverse vrai/faux</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUCLES -->
+  <div class="section" id="s-boucles">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-purple">Concept</span> La boucle for</div>
+      <div class="concept-desc">La boucle <code>for</code> répète un bloc de code <strong>pour chaque élément</strong> d'une liste (ou d'une plage de nombres).</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Parcourir une liste</span></div>
+        <div><span class="c-var">machines</span> = [<span class="c-str">"PC"</span>, <span class="c-str">"Serveur"</span>, <span class="c-str">"Routeur"</span>]</div>
+        <div><span class="c-kw">for</span> <span class="c-var">m</span> <span class="c-kw">in</span> <span class="c-var">machines</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-var">m</span>)</div>
+        <div style="margin-top:10px"><span class="c-comment"># Compter de 0 à 4</span></div>
+        <div><span class="c-kw">for</span> <span class="c-var">i</span> <span class="c-kw">in</span> <span class="c-fn">range</span>(<span class="c-num">5</span>):</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-var">i</span>)</div>
+      </div>
+      <div class="result"><div class="result-label">résultat (liste) :</div>PC<br>Serveur<br>Routeur</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-purple">Concept</span> La boucle while</div>
+      <div class="concept-desc">La boucle <code>while</code> répète tant qu'une condition est vraie. Utile quand on ne sait pas à l'avance combien de fois répéter.</div>
+      <div class="code-block">
+        <div><span class="c-var">compteur</span> = <span class="c-num">0</span></div>
+        <div><span class="c-kw">while</span> <span class="c-var">compteur</span> < <span class="c-num">3</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">f"Tour numéro </span>{<span class="c-var">compteur</span>}<span class="c-str">"</span>)</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">compteur</span> += <span class="c-num">1</span></div>
+      </div>
+      <div class="result"><div class="result-label">résultat :</div>Tour numéro 0<br>Tour numéro 1<br>Tour numéro 2</div>
+      <div class="tip"><code>compteur += 1</code> est un raccourci pour <code>compteur = compteur + 1</code>. Sans ça, la boucle tourne à l'infini !</div>
+    </div>
+  </div>
+
+  <!-- FONCTIONS -->
+  <div class="section" id="s-fonctions">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-teal">Concept</span> Créer une fonction</div>
+      <div class="concept-desc">Une fonction est un <strong>bloc de code réutilisable</strong> qu'on définit une fois et qu'on appelle autant de fois qu'on veut. Elle peut recevoir des paramètres et retourner un résultat.</div>
+      <div class="code-block">
+        <div><span class="c-kw">def</span> <span class="c-fn">saluer</span>(<span class="c-var">prenom</span>):</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">f"Bonjour </span>{<span class="c-var">prenom</span>}<span class="c-str"> !"</span>)</div>
+        <div style="margin-top:8px"><span class="c-fn">saluer</span>(<span class="c-str">"Hugo"</span>)</div>
+        <div><span class="c-fn">saluer</span>(<span class="c-str">"Alice"</span>)</div>
+      </div>
+      <div class="result"><div class="result-label">résultat :</div>Bonjour Hugo !<br>Bonjour Alice !</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-teal">return</span> Retourner une valeur</div>
+      <div class="concept-desc"><code>return</code> permet à la fonction de <strong>renvoyer un résultat</strong> qu'on peut stocker dans une variable.</div>
+      <div class="code-block">
+        <div><span class="c-kw">def</span> <span class="c-fn">additionner</span>(<span class="c-var">a</span>, <span class="c-var">b</span>):</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-var">a</span> + <span class="c-var">b</span></div>
+        <div style="margin-top:8px"><span class="c-var">resultat</span> = <span class="c-fn">additionner</span>(<span class="c-num">5</span>, <span class="c-num">3</span>)</div>
+        <div><span class="c-fn">print</span>(<span class="c-var">resultat</span>)</div>
+      </div>
+      <div class="result"><div class="result-label">résultat :</div>8</div>
+    </div>
+  </div>
+
+  <!-- DICTIONNAIRES -->
+  <div class="section" id="s-dicos">
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-blue">Concept</span> Un dictionnaire, c'est quoi ?</div>
+      <div class="concept-desc">Un dictionnaire stocke des données sous forme de <strong>clé : valeur</strong>. Comme une vraie fiche d'identité — chaque info a un label.</div>
+      <div class="code-block">
+        <div><span class="c-var">machine</span> = {</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">"nom"</span>: <span class="c-str">"PC-Bureau"</span>,</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">"ip"</span>: <span class="c-str">"192.168.1.10"</span>,</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">"infecte"</span>: <span class="c-kw">False</span></div>
+        <div>}</div>
+        <div style="margin-top:8px"><span class="c-fn">print</span>(<span class="c-var">machine</span>[<span class="c-str">"nom"</span>])</div>
+        <div><span class="c-fn">print</span>(<span class="c-var">machine</span>[<span class="c-str">"ip"</span>])</div>
+      </div>
+      <div class="result"><div class="result-label">résultat :</div>PC-Bureau<br>192.168.1.10</div>
+    </div>
+    <div class="concept">
+      <div class="concept-title"><span class="badge badge-blue">Opérations</span> Modifier un dictionnaire</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Modifier une valeur</span></div>
+        <div><span class="c-var">machine</span>[<span class="c-str">"infecte"</span>] = <span class="c-kw">True</span></div>
+        <div style="margin-top:6px"><span class="c-comment"># Ajouter une nouvelle clé</span></div>
+        <div><span class="c-var">machine</span>[<span class="c-str">"type"</span>] = <span class="c-str">"serveur"</span></div>
+        <div style="margin-top:6px"><span class="c-comment"># Supprimer une clé</span></div>
+        <div><span class="c-kw">del</span> <span class="c-var">machine</span>[<span class="c-str">"infecte"</span>]</div>
+        <div style="margin-top:6px"><span class="c-comment"># Vérifier si une clé existe</span></div>
+        <div><span class="c-kw">if</span> <span class="c-str">"ip"</span> <span class="c-kw">in</span> <span class="c-var">machine</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">"IP trouvée !"</span>)</div>
+      </div>
+      <div class="tip">Dans ton projet, chaque machine du réseau est un dictionnaire. C'est pour ça qu'on écrit <code>machine["nom"]</code> ou <code>machine["infecte"]</code>.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
