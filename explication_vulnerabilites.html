@@ -1,0 +1,150 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.badge-blue { background: #E6F1FB; color: #0C447C; }
+.badge-teal { background: #E1F5EE; color: #085041; }
+.badge-amber { background: #FAEEDA; color: #633806; }
+.badge-coral { background: #FAECE7; color: #712B13; }
+.badge-purple { background: #EEEDFE; color: #3C3489; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('cve')">CVE c'est quoi</button>
+    <button class="nav-btn" onclick="show('api')">L'API NIST</button>
+    <button class="nav-btn" onclick="show('score')">Score de gravité</button>
+    <button class="nav-btn" onclick="show('boucle')">La boucle principale</button>
+    <button class="nav-btn" onclick="show('exception')">Try/Except</button>
+  </div>
+
+  <!-- CVE -->
+  <div class="section active" id="s-cve">
+    <div class="bloc">
+      <div class="bloc-title">C'est quoi une CVE ?</div>
+      <div class="annotation" style="margin-top:0">
+        CVE = <strong>Common Vulnerabilities and Exposures</strong>. C'est une base de données mondiale qui recense toutes les failles de sécurité connues dans les logiciels.<br><br>
+        Chaque faille a un identifiant unique : <strong>CVE-2017-0144</strong><br>
+        → L'année = 2017<br>
+        → Le numéro = 0144<br><br>
+        <strong>CVE-2017-0144</strong> c'est la faille WannaCry — elle exploitait le port 445 (SMB) que ton PC a ouvert ! En 2017 elle a infecté 230 000 ordinateurs dans 150 pays.<br><br>
+        La base CVE est maintenue par le gouvernement américain (NIST) et est publique — tout le monde peut la consulter, les défenseurs comme les attaquants.
+      </div>
+    </div>
+  </div>
+
+  <!-- API -->
+  <div class="section" id="s-api">
+    <div class="bloc">
+      <div class="bloc-title">L'API NIST — interroger la base CVE</div>
+      <div class="code-block">
+        <div><span class="c-var">url</span> = <span class="c-str">f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={service}+{version}"</span></div>
+        <div><span class="c-var">reponse</span> = <span class="c-var">requests</span>.<span class="c-fn">get</span>(<span class="c-var">url</span>, <span class="c-var">timeout</span>=<span class="c-num">10</span>)</div>
+        <div><span class="c-var">data</span> = <span class="c-var">reponse</span>.<span class="c-fn">json</span>()</div>
+      </div>
+      <div class="annotation">
+        Une <strong>API</strong> c'est une interface qui permet à deux programmes de communiquer. Ici on envoie une requête HTTP au serveur du NIST (comme quand ton navigateur charge une page web), et il nous répond avec un JSON contenant les CVE trouvées.<br><br>
+        <code>requests.get(url)</code> → envoie la requête<br>
+        <code>reponse.json()</code> → convertit la réponse en dictionnaire Python<br>
+        <code>timeout=10</code> → abandonne si le serveur ne répond pas en 10 secondes
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Ce que renvoie l'API</div>
+      <div class="code-block">
+        <div>{ <span class="c-str">"vulnerabilities"</span>: [</div>
+        <div>&nbsp;&nbsp;{ <span class="c-str">"cve"</span>: {</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">"id"</span>: <span class="c-str">"CVE-2021-41773"</span>,</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">"descriptions"</span>: [{ <span class="c-str">"value"</span>: <span class="c-str">"Path traversal..."</span> }],</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">"metrics"</span>: { <span class="c-str">"cvssMetricV31"</span>: [...] }</div>
+        <div>&nbsp;&nbsp;}}</div>
+        <div>]}</div>
+      </div>
+      <div class="annotation">C'est un JSON imbriqué — des dictionnaires dans des listes dans des dictionnaires. On navigue dedans avec des crochets comme <code>data["vulnerabilities"][0]["cve"]["id"]</code>.</div>
+    </div>
+  </div>
+
+  <!-- SCORE -->
+  <div class="section" id="s-score">
+    <div class="bloc">
+      <div class="bloc-title">Le score CVSS — mesurer la gravité d'une faille</div>
+      <div class="annotation" style="margin-top:0">
+        Chaque CVE a un score de <strong>0 à 10</strong> qui mesure sa dangerosité :<br><br>
+        🟢 <strong>0.0 – 3.9</strong> → LOW (faible)<br>
+        🟡 <strong>4.0 – 6.9</strong> → MEDIUM (moyen)<br>
+        🟠 <strong>7.0 – 8.9</strong> → HIGH (élevé)<br>
+        🔴 <strong>9.0 – 10.0</strong> → CRITICAL (critique)<br><br>
+        WannaCry avait un score de <strong>9.3 / CRITICAL</strong>.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Comment on récupère le score</div>
+      <div class="code-block">
+        <div><span class="c-kw">if</span> <span class="c-str">"cvssMetricV31"</span> <span class="c-kw">in</span> <span class="c-var">cve</span>[<span class="c-str">"metrics"</span>]:</div>
+        <div>&nbsp;&nbsp;<span class="c-var">score</span> = <span class="c-var">cve</span>[<span class="c-str">"metrics"</span>][<span class="c-str">"cvssMetricV31"</span>][<span class="c-num">0</span>][<span class="c-str">"cvssData"</span>][<span class="c-str">"baseScore"</span>]</div>
+        <div>&nbsp;&nbsp;<span class="c-var">gravite</span> = <span class="c-var">cve</span>[<span class="c-str">"metrics"</span>][<span class="c-str">"cvssMetricV31"</span>][<span class="c-num">0</span>][<span class="c-str">"cvssData"</span>][<span class="c-str">"baseSeverity"</span>]</div>
+        <div><span class="c-kw">elif</span> <span class="c-str">"cvssMetricV2"</span> <span class="c-kw">in</span> <span class="c-var">cve</span>[<span class="c-str">"metrics"</span>]:</div>
+        <div>&nbsp;&nbsp;<span class="c-var">score</span> = <span class="c-var">cve</span>[<span class="c-str">"metrics"</span>][<span class="c-str">"cvssMetricV2"</span>][<span class="c-num">0</span>][<span class="c-str">"cvssData"</span>][<span class="c-str">"baseScore"</span>]</div>
+      </div>
+      <div class="annotation">Il existe deux versions du score CVSS — V3.1 (plus récent) et V2 (plus ancien). On vérifie d'abord V3.1, et si absent on prend V2. Le <code>[0]</code> prend le premier résultat de la liste.</div>
+    </div>
+  </div>
+
+  <!-- BOUCLE -->
+  <div class="section" id="s-boucle">
+    <div class="bloc">
+      <div class="bloc-title">La boucle principale — logique du programme</div>
+      <div class="code-block">
+        <div><span class="c-kw">for</span> <span class="c-var">machine</span> <span class="c-kw">in</span> <span class="c-var">machines</span>:          <span class="c-comment"># pour chaque machine</span></div>
+        <div>&nbsp;&nbsp;<span class="c-kw">for</span> <span class="c-var">port</span> <span class="c-kw">in</span> <span class="c-var">machine</span>[<span class="c-str">"ports"</span>]:   <span class="c-comment"># pour chaque port ouvert</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">service</span> = <span class="c-var">port</span>[<span class="c-str">"service"</span>]</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">version</span> = <span class="c-var">port</span>[<span class="c-str">"version"</span>]</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">cves</span> = <span class="c-fn">chercher_cve</span>(<span class="c-var">service</span>, <span class="c-var">version</span>)  <span class="c-comment"># interroge NIST</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">machine</span>[<span class="c-str">"vulnerabilites"</span>] = <span class="c-var">cves</span>  <span class="c-comment"># stocke les résultats</span></div>
+      </div>
+      <div class="annotation">C'est une <strong>double boucle</strong> — une boucle dans une boucle. Pour chaque machine on parcourt ses ports, et pour chaque port on interroge la base CVE. Si une machine a 3 ports, on fait 3 requêtes à l'API.</div>
+    </div>
+  </div>
+
+  <!-- EXCEPTION -->
+  <div class="section" id="s-exception">
+    <div class="bloc">
+      <div class="bloc-title">Try / Except — gérer les erreurs</div>
+      <div class="code-block">
+        <div><span class="c-kw">try</span>:</div>
+        <div>&nbsp;&nbsp;<span class="c-var">reponse</span> = <span class="c-var">requests</span>.<span class="c-fn">get</span>(<span class="c-var">url</span>, <span class="c-var">timeout</span>=<span class="c-num">10</span>)</div>
+        <div>&nbsp;&nbsp;<span class="c-var">data</span> = <span class="c-var">reponse</span>.<span class="c-fn">json</span>()</div>
+        <div><span class="c-kw">except</span> <span class="c-fn">Exception</span> <span class="c-kw">as</span> <span class="c-var">e</span>:</div>
+        <div>&nbsp;&nbsp;<span class="c-kw">return</span> []</div>
+      </div>
+      <div class="annotation">
+        Le <code>try/except</code> c'est comme un filet de sécurité. Si quelque chose se passe mal dans le bloc <code>try</code> (pas de connexion internet, serveur lent, réponse invalide), au lieu de planter tout le programme Python passe dans le bloc <code>except</code> et retourne une liste vide.<br><br>
+        Sans ça, une seule erreur réseau ferait crasher tout le scan.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

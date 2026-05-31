@@ -1,0 +1,179 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.schema-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 13px; }
+.schema-box { padding: 5px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 120px; text-align: center; }
+.schema-desc { color: var(--color-text-secondary); font-size: 12px; }
+.arrow { color: var(--color-text-tertiary); }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('reportlab')">ReportLab</button>
+    <button class="nav-btn" onclick="show('styles')">Les styles</button>
+    <button class="nav-btn" onclick="show('contenu')">Le contenu</button>
+    <button class="nav-btn" onclick="show('tableau')">Le tableau</button>
+    <button class="nav-btn" onclick="show('resume')">Résumé global</button>
+  </div>
+
+  <!-- REPORTLAB -->
+  <div class="section active" id="s-reportlab">
+    <div class="bloc">
+      <div class="bloc-title">C'est quoi ReportLab ?</div>
+      <div class="annotation" style="margin-top:0">
+        ReportLab est une bibliothèque Python qui permet de créer des fichiers PDF depuis du code. Au lieu d'ouvrir Word et de taper du texte, tu décris le document en Python et il le génère automatiquement.<br><br>
+        C'est utilisé en entreprise pour générer des factures, des rapports, des bulletins de paie automatiquement.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Les imports — chaque outil a son rôle</div>
+      <div class="code-block">
+        <div><span class="c-kw">from</span> reportlab.lib.pagesizes <span class="c-kw">import</span> A4 <span class="c-comment">       # taille de page</span></div>
+        <div><span class="c-kw">from</span> reportlab.lib <span class="c-kw">import</span> colors <span class="c-comment">              # couleurs</span></div>
+        <div><span class="c-kw">from</span> reportlab.lib.styles <span class="c-kw">import</span> ... <span class="c-comment">         # styles de texte</span></div>
+        <div><span class="c-kw">from</span> reportlab.platypus <span class="c-kw">import</span> Paragraph <span class="c-comment">    # paragraphe</span></div>
+        <div><span class="c-kw">from</span> reportlab.platypus <span class="c-kw">import</span> Table <span class="c-comment">        # tableau</span></div>
+        <div><span class="c-kw">from</span> reportlab.platypus <span class="c-kw">import</span> Spacer <span class="c-comment">       # espace vide</span></div>
+        <div><span class="c-kw">from</span> reportlab.platypus <span class="c-kw">import</span> HRFlowable <span class="c-comment">   # ligne horizontale</span></div>
+      </div>
+      <div class="annotation">ReportLab est divisé en plusieurs modules. <code>platypus</code> (oui c'est le vrai nom !) gère la mise en page automatique — il place les éléments les uns après les autres comme un traitement de texte.</div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Créer le document</div>
+      <div class="code-block">
+        <div><span class="c-var">doc</span> = <span class="c-fn">SimpleDocTemplate</span>(<span class="c-var">nom_fichier</span>, <span class="c-var">pagesize</span>=<span class="c-var">A4</span>,</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">rightMargin</span>=<span class="c-num">2</span>*<span class="c-var">cm</span>, <span class="c-var">leftMargin</span>=<span class="c-num">2</span>*<span class="c-var">cm</span>)</div>
+        <div style="margin-top:8px"><span class="c-var">doc</span>.<span class="c-fn">build</span>(<span class="c-var">contenu</span>)</div>
+      </div>
+      <div class="annotation"><code>SimpleDocTemplate</code> crée le fichier PDF avec les marges définies. <code>doc.build(contenu)</code> à la fin assemble tout et génère le fichier — c'est la dernière instruction qui déclenche la création.</div>
+    </div>
+  </div>
+
+  <!-- STYLES -->
+  <div class="section" id="s-styles">
+    <div class="bloc">
+      <div class="bloc-title">Les styles — définir l'apparence du texte</div>
+      <div class="code-block">
+        <div><span class="c-var">titre_style</span> = <span class="c-fn">ParagraphStyle</span>(</div>
+        <div>&nbsp;&nbsp;<span class="c-str">"titre"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-var">fontSize</span>=<span class="c-num">22</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-var">textColor</span>=<span class="c-var">colors</span>.<span class="c-fn">HexColor</span>(<span class="c-str">"#00ff88"</span>),</div>
+        <div>&nbsp;&nbsp;<span class="c-var">alignment</span>=<span class="c-var">TA_CENTER</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-var">fontName</span>=<span class="c-str">"Helvetica-Bold"</span></div>
+        <div>)</div>
+      </div>
+      <div class="annotation">
+        Un style c'est un ensemble de règles de mise en forme qu'on applique à un texte. On définit les styles une fois en haut, et on les réutilise partout dans le document.<br><br>
+        <strong>fontSize</strong> → taille de la police<br>
+        <strong>textColor</strong> → couleur du texte<br>
+        <strong>alignment</strong> → alignement (centre, gauche, droite)<br>
+        <strong>fontName</strong> → police utilisée
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Les différents styles du rapport</div>
+      <div class="schema-row"><div class="schema-box" style="background:#0a0a1a;color:#00ff88">titre_style</div><div class="arrow">→</div><div class="schema-desc">Titre principal vert, 22px, centré</div></div>
+      <div class="schema-row"><div class="schema-box" style="background:#f5f5f5;color:#0066cc">section_style</div><div class="arrow">→</div><div class="schema-desc">Titres de section bleus, 14px</div></div>
+      <div class="schema-row"><div class="schema-box" style="background:#f5f5f5;color:#333">machine_style</div><div class="arrow">→</div><div class="schema-desc">Nom de machine, gras, 12px</div></div>
+      <div class="schema-row"><div class="schema-box" style="background:#f5f5f5;color:red">danger_style</div><div class="arrow">→</div><div class="schema-desc">Vulnérabilités critiques en rouge</div></div>
+      <div class="schema-row"><div class="schema-box" style="background:#f5f5f5;color:#009900">ok_style</div><div class="arrow">→</div><div class="schema-desc">Statut sain en vert</div></div>
+    </div>
+  </div>
+
+  <!-- CONTENU -->
+  <div class="section" id="s-contenu">
+    <div class="bloc">
+      <div class="bloc-title">La liste contenu — empiler les éléments</div>
+      <div class="code-block">
+        <div><span class="c-var">contenu</span> = []</div>
+        <div style="margin-top:6px"><span class="c-var">contenu</span>.<span class="c-fn">append</span>(<span class="c-fn">Paragraph</span>(<span class="c-str">"🔐 CyberMap 3D"</span>, <span class="c-var">titre_style</span>))</div>
+        <div><span class="c-var">contenu</span>.<span class="c-fn">append</span>(<span class="c-fn">Spacer</span>(<span class="c-num">1</span>, <span class="c-num">0.5</span>*<span class="c-var">cm</span>))</div>
+        <div><span class="c-var">contenu</span>.<span class="c-fn">append</span>(<span class="c-fn">HRFlowable</span>(...))</div>
+        <div><span class="c-var">contenu</span>.<span class="c-fn">append</span>(<span class="c-fn">Table</span>(...))</div>
+      </div>
+      <div class="annotation">
+        <code>contenu</code> est une simple liste Python. On y ajoute des éléments dans l'ordre d'apparition dans le PDF :<br><br>
+        <strong>Paragraph</strong> → un bloc de texte<br>
+        <strong>Spacer</strong> → un espace vide entre les éléments<br>
+        <strong>HRFlowable</strong> → une ligne horizontale de séparation<br>
+        <strong>Table</strong> → un tableau avec des lignes et colonnes<br><br>
+        À la fin, <code>doc.build(contenu)</code> prend cette liste et construit le PDF dans l'ordre.
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLEAU -->
+  <div class="section" id="s-tableau">
+    <div class="bloc">
+      <div class="bloc-title">Le tableau — afficher les données en grille</div>
+      <div class="code-block">
+        <div><span class="c-var">resume_data</span> = [</div>
+        <div>&nbsp;&nbsp;[<span class="c-str">"Indicateur"</span>, <span class="c-str">"Valeur"</span>],        <span class="c-comment"># en-tête</span></div>
+        <div>&nbsp;&nbsp;[<span class="c-str">"Machines détectées"</span>, <span class="c-str">"7"</span>],</div>
+        <div>&nbsp;&nbsp;[<span class="c-str">"Ports ouverts"</span>, <span class="c-str">"4"</span>],</div>
+        <div>&nbsp;&nbsp;[<span class="c-str">"Vulnérabilités"</span>, <span class="c-str">"0"</span>],</div>
+        <div>]</div>
+        <div style="margin-top:8px"><span class="c-var">table</span> = <span class="c-fn">Table</span>(<span class="c-var">resume_data</span>, <span class="c-var">colWidths</span>=[<span class="c-num">10</span>*<span class="c-var">cm</span>, <span class="c-num">6</span>*<span class="c-var">cm</span>])</div>
+      </div>
+      <div class="annotation">Un tableau dans ReportLab c'est une liste de listes — chaque liste intérieure est une ligne, chaque élément est une cellule. <code>colWidths</code> définit la largeur de chaque colonne en centimètres.</div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Le style du tableau</div>
+      <div class="code-block">
+        <div><span class="c-var">table</span>.<span class="c-fn">setStyle</span>(<span class="c-fn">TableStyle</span>([</div>
+        <div>&nbsp;&nbsp;(<span class="c-str">"BACKGROUND"</span>, (<span class="c-num">0</span>,<span class="c-num">0</span>), (-<span class="c-num">1</span>,<span class="c-num">0</span>), <span class="c-var">colors</span>.<span class="c-fn">HexColor</span>(<span class="c-str">"#0a0a1a"</span>)),</div>
+        <div>&nbsp;&nbsp;(<span class="c-str">"TEXTCOLOR"</span>, (<span class="c-num">0</span>,<span class="c-num">0</span>), (-<span class="c-num">1</span>,<span class="c-num">0</span>), <span class="c-var">colors</span>.<span class="c-fn">HexColor</span>(<span class="c-str">"#00ff88"</span>)),</div>
+        <div>&nbsp;&nbsp;(<span class="c-str">"GRID"</span>, (<span class="c-num">0</span>,<span class="c-num">0</span>), (-<span class="c-num">1</span>,-<span class="c-num">1</span>), <span class="c-num">0.5</span>, <span class="c-var">colors</span>.<span class="c-fn">HexColor</span>(<span class="c-str">"#cccccc"</span>)),</div>
+        <div>]))</div>
+      </div>
+      <div class="annotation">
+        Les coordonnées <code>(0,0)</code> signifient colonne 0, ligne 0. <code>(-1,0)</code> signifie "dernière colonne, ligne 0". Donc <code>(0,0),(-1,0)</code> = toute la première ligne.<br><br>
+        <code>(-1,-1)</code> = dernière colonne, dernière ligne → donc <code>(0,0),(-1,-1)</code> = tout le tableau.
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUME -->
+  <div class="section" id="s-resume">
+    <div class="bloc">
+      <div class="bloc-title">Le calcul du résumé</div>
+      <div class="code-block">
+        <div><span class="c-var">total_machines</span> = <span class="c-fn">len</span>(<span class="c-var">machines</span>)</div>
+        <div><span class="c-var">total_ports</span> = <span class="c-fn">sum</span>(<span class="c-fn">len</span>(<span class="c-var">m</span>.<span class="c-fn">get</span>(<span class="c-str">"ports"</span>, [])) <span class="c-kw">for</span> <span class="c-var">m</span> <span class="c-kw">in</span> <span class="c-var">machines</span>)</div>
+        <div><span class="c-var">total_vulns</span> = <span class="c-fn">sum</span>(<span class="c-fn">len</span>(<span class="c-var">m</span>.<span class="c-fn">get</span>(<span class="c-str">"vulnerabilites"</span>, [])) <span class="c-kw">for</span> <span class="c-var">m</span> <span class="c-kw">in</span> <span class="c-var">machines</span>)</div>
+      </div>
+      <div class="annotation">
+        <code>len(machines)</code> → compte le nombre de machines.<br><br>
+        La ligne <code>sum(len(...) for m in machines)</code> c'est une <strong>compréhension de générateur</strong> — une boucle condensée sur une ligne. Elle calcule le nombre de ports de chaque machine et les additionne tous. C'est l'équivalent de :<br><br>
+        <code>total = 0</code><br>
+        <code>for m in machines:</code><br>
+        <code>&nbsp;&nbsp;total += len(m["ports"])</code><br><br>
+        <code>.get("ports", [])</code> → si la clé "ports" n'existe pas, retourne une liste vide plutôt que de planter.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

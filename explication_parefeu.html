@@ -1,0 +1,149 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.schema-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 13px; }
+.schema-box { padding: 5px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 100px; text-align: center; }
+.arrow { color: var(--color-text-tertiary); font-size: 18px; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('variables')">Variables globales</button>
+    <button class="nav-btn" onclick="show('attaque')">lancerAttaque()</button>
+    <button class="nav-btn" onclick="show('parefeu')">activerParefeu()</button>
+    <button class="nav-btn" onclick="show('couleurs')">Les couleurs</button>
+    <button class="nav-btn" onclick="show('reel')">Lien avec la réalité</button>
+  </div>
+
+  <!-- VARIABLES -->
+  <div class="section active" id="s-variables">
+    <div class="bloc">
+      <div class="bloc-title">Variables globales — partagées entre les fonctions</div>
+      <div class="code-block">
+        <div><span class="c-kw">let</span> <span class="c-var">attaqueInterval</span> = <span class="c-kw">null</span></div>
+        <div><span class="c-kw">let</span> <span class="c-var">attaqueEnCours</span> = <span class="c-kw">false</span></div>
+      </div>
+      <div class="annotation">
+        Ces deux variables sont déclarées <strong>en dehors</strong> des fonctions — elles sont donc accessibles par toutes les fonctions du programme. C'est ce qu'on appelle des <strong>variables globales</strong>.<br><br>
+        <code>attaqueInterval</code> → stocke la référence du <code>setInterval</code> pour pouvoir l'arrêter plus tard avec <code>clearInterval</code>. Sans ça, impossible de stopper l'attaque !<br><br>
+        <code>attaqueEnCours</code> → un booléen qui dit si l'attaque est active ou non. <code>true</code> = en cours, <code>false</code> = stoppée.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Pourquoi globales ?</div>
+      <div class="annotation" style="margin-top:0">
+        Si ces variables étaient à l'intérieur de <code>lancerAttaque()</code>, la fonction <code>activerParefeu()</code> ne pourrait pas y accéder — chaque fonction a son propre espace mémoire.<br><br>
+        En les mettant dehors, les deux fonctions <strong>partagent</strong> les mêmes variables — comme un tableau d'affichage visible par tout le monde.
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTAQUE -->
+  <div class="section" id="s-attaque">
+    <div class="bloc">
+      <div class="bloc-title">Ce qui a changé dans lancerAttaque()</div>
+      <div class="code-block">
+        <div><span class="c-comment">// Nouveau — affiche le bouton pare-feu</span></div>
+        <div><span class="c-fn">getElementById</span>(<span class="c-str">"btn-parefeu"</span>).<span class="c-var">style</span>.<span class="c-var">display</span> = <span class="c-str">"block"</span></div>
+        <div style="margin-top:8px"><span class="c-comment">// Nouveau — marque l'attaque comme active</span></div>
+        <div><span class="c-var">attaqueEnCours</span> = <span class="c-kw">true</span></div>
+        <div style="margin-top:8px"><span class="c-comment">// Nouveau — stocke le setInterval</span></div>
+        <div><span class="c-var">attaqueInterval</span> = <span class="c-fn">setInterval</span>(() => { ... }, <span class="c-num">1000</span>)</div>
+        <div style="margin-top:8px"><span class="c-comment">// Nouveau — quand terminée</span></div>
+        <div><span class="c-var">attaqueEnCours</span> = <span class="c-kw">false</span></div>
+      </div>
+      <div class="annotation">
+        La différence principale c'est qu'on <strong>sauvegarde</strong> le <code>setInterval</code> dans <code>attaqueInterval</code>. Avant on le lançait sans le stocker — impossible à arrêter. Maintenant on a une "poignée" pour le stopper quand on veut avec <code>clearInterval(attaqueInterval)</code>.
+      </div>
+    </div>
+  </div>
+
+  <!-- PAREFEU -->
+  <div class="section" id="s-parefeu">
+    <div class="bloc">
+      <div class="bloc-title">activerParefeu() — stopper l'attaque</div>
+      <div class="code-block">
+        <div><span class="c-fn">clearInterval</span>(<span class="c-var">attaqueInterval</span>) <span class="c-comment">// stoppe la propagation</span></div>
+        <div><span class="c-var">attaqueEnCours</span> = <span class="c-kw">false</span>         <span class="c-comment">// marque comme stoppée</span></div>
+        <div style="margin-top:8px"><span class="c-var">meshes</span>.<span class="c-fn">forEach</span>(<span class="c-var">m</span> => {</div>
+        <div>&nbsp;&nbsp;<span class="c-var">m</span>.<span class="c-var">modele</span>.<span class="c-fn">traverse</span>(<span class="c-var">child</span> => {</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">const</span> <span class="c-var">hex</span> = <span class="c-var">child</span>.<span class="c-var">material</span>.<span class="c-var">color</span>.<span class="c-fn">getHex</span>()</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">if</span> (<span class="c-var">hex</span> === <span class="c-num">0xff2222</span>) {  <span class="c-comment">// rouge = infecté</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-comment">// passe en orange</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;} <span class="c-kw">else</span> {</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-comment">// passe en vert</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;}</div>
+        <div>&nbsp;&nbsp;})</div>
+        <div>})</div>
+      </div>
+      <div class="annotation">
+        <code>clearInterval</code> stoppe immédiatement la boucle d'infection — plus aucune machine ne sera infectée.<br><br>
+        Ensuite on parcourt toutes les machines avec <code>forEach</code> et <code>traverse</code>, et on regarde la couleur actuelle avec <code>getHex()</code> :<br><br>
+        → Rouge (<code>0xff2222</code>) = déjà infectée → on la passe en <strong>orange</strong> (compromise mais stoppée)<br>
+        → Autre couleur = saine → on la remet en <strong>vert</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- COULEURS -->
+  <div class="section" id="s-couleurs">
+    <div class="bloc">
+      <div class="bloc-title">Le système de couleurs — lire et changer</div>
+      <div class="code-block">
+        <div><span class="c-comment">// Lire la couleur actuelle</span></div>
+        <div><span class="c-kw">const</span> <span class="c-var">hex</span> = <span class="c-var">child</span>.<span class="c-var">material</span>.<span class="c-var">color</span>.<span class="c-fn">getHex</span>()</div>
+        <div style="margin-top:8px"><span class="c-comment">// Comparer</span></div>
+        <div><span class="c-kw">if</span> (<span class="c-var">hex</span> === <span class="c-num">0xff2222</span>) { ... }</div>
+        <div style="margin-top:8px"><span class="c-comment">// Changer la couleur</span></div>
+        <div><span class="c-var">child</span>.<span class="c-var">material</span> = <span class="c-kw">new</span> <span class="c-fn">THREE.MeshPhongMaterial</span>({ <span class="c-var">color</span>: <span class="c-num">0xff8800</span> })</div>
+      </div>
+      <div class="annotation">
+        <code>getHex()</code> retourne la couleur actuelle du matériau en hexadécimal — comme lire l'étiquette d'une boîte.<br><br>
+        Pour changer la couleur on crée un nouveau matériau — c'est la façon de faire dans Three.js.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Les 3 états des machines</div>
+      <div class="schema-row"><div class="schema-box" style="background:#00ff88;color:#000">0x00ff88</div><div class="arrow">→</div><div style="font-size:13px;color:var(--color-text-secondary)">Vert — machine <strong>saine</strong></div></div>
+      <div class="schema-row"><div class="schema-box" style="background:#ff2222;color:#fff">0xff2222</div><div class="arrow">→</div><div style="font-size:13px;color:var(--color-text-secondary)">Rouge — machine <strong>infectée</strong></div></div>
+      <div class="schema-row"><div class="schema-box" style="background:#ff8800;color:#fff">0xff8800</div><div class="arrow">→</div><div style="font-size:13px;color:var(--color-text-secondary)">Orange — infectée mais <strong>stoppée</strong> par le pare-feu</div></div>
+    </div>
+  </div>
+
+  <!-- REEL -->
+  <div class="section" id="s-reel">
+    <div class="bloc">
+      <div class="bloc-title">Le lien avec la vraie cybersécurité</div>
+      <div class="annotation" style="margin-top:0">
+        Ce que tu simules c'est exactement ce qui se passe lors d'une vraie attaque réseau :<br><br>
+        <strong>Sans pare-feu</strong> → le virus se propage librement de machine en machine jusqu'à tout infecter.<br><br>
+        <strong>Avec pare-feu</strong> → dès qu'une activité suspecte est détectée, le pare-feu isole les machines infectées et bloque la propagation. Les machines déjà infectées restent compromises (orange) mais les autres sont sauvées (vert).<br><br>
+        C'est le principe du <strong>containment</strong> en cybersécurité — limiter les dégâts en isolant rapidement la menace. Plus vite tu actives le pare-feu, moins de machines sont perdues !
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

@@ -1,0 +1,163 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.schema-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 13px; }
+.schema-box { padding: 6px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 140px; text-align: center; }
+.arrow { color: var(--color-text-tertiary); font-size: 18px; }
+.schema-desc { color: var(--color-text-secondary); font-size: 12px; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('principe')">Le principe</button>
+    <button class="nav-btn" onclick="show('fichiers')">Les fichiers</button>
+    <button class="nav-btn" onclick="show('comparaison')">La comparaison</button>
+    <button class="nav-btn" onclick="show('os')">os.path</button>
+    <button class="nav-btn" onclick="show('reel')">Lien réel</button>
+  </div>
+
+  <!-- PRINCIPE -->
+  <div class="section active" id="s-principe">
+    <div class="bloc">
+      <div class="bloc-title">Le principe général</div>
+      <div class="annotation" style="margin-top:0">
+        Ce script fonctionne comme un <strong>gardien de sécurité</strong> qui connaît tous les habitants d'un immeuble. Chaque fois qu'il fait sa ronde, il vérifie si quelqu'un de nouveau est entré sans autorisation.<br><br>
+        <strong>1er lancement</strong> → il scanne le réseau et enregistre toutes les machines comme "connues" dans un fichier.<br><br>
+        <strong>Lancements suivants</strong> → il rescanne et compare avec la liste. Si une nouvelle machine apparaît = alerte intrus !
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Les 3 scénarios possibles</div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#E1F5EE;color:#085041">Machine connue</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">✓ Normal, rien à signaler</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAECE7;color:#712B13">Nouvelle machine</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">🚨 ALERTE — intrus potentiel !</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAEEDA;color:#633806">Machine disparue</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">⚠ Appareil éteint ou déconnecté</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FICHIERS -->
+  <div class="section" id="s-fichiers">
+    <div class="bloc">
+      <div class="bloc-title">Les deux fichiers de données</div>
+      <div class="code-block">
+        <div><span class="c-var">FICHIER_CONNUS</span> = <span class="c-str">"machines_connues.json"</span></div>
+        <div><span class="c-var">FICHIER_ALERTES</span> = <span class="c-str">"alertes.json"</span></div>
+      </div>
+      <div class="annotation">
+        <strong>machines_connues.json</strong> → la liste blanche. Toutes les machines autorisées sur le réseau. Ce fichier est créé au 1er lancement et mis à jour à chaque scan.<br><br>
+        <strong>alertes.json</strong> → le journal des intrusions. Chaque fois qu'une machine inconnue est détectée, elle est enregistrée ici avec l'heure exacte.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Charger et sauvegarder les données</div>
+      <div class="code-block">
+        <div><span class="c-kw">def</span> <span class="c-fn">charger_machines_connues</span>():</div>
+        <div>&nbsp;&nbsp;<span class="c-kw">if</span> <span class="c-var">os</span>.<span class="c-var">path</span>.<span class="c-fn">exists</span>(<span class="c-var">FICHIER_CONNUS</span>):</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">with</span> <span class="c-fn">open</span>(<span class="c-var">FICHIER_CONNUS</span>, <span class="c-str">"r"</span>) <span class="c-kw">as</span> <span class="c-var">f</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-var">json</span>.<span class="c-fn">load</span>(<span class="c-var">f</span>)</div>
+        <div>&nbsp;&nbsp;<span class="c-kw">return</span> {}</div>
+      </div>
+      <div class="annotation">Si le fichier existe on le charge, sinon on retourne un dictionnaire vide <code>{}</code>. C'est la mémoire du programme entre deux lancements — sans ça il oublierait tout à chaque fois.</div>
+    </div>
+  </div>
+
+  <!-- COMPARAISON -->
+  <div class="section" id="s-comparaison">
+    <div class="bloc">
+      <div class="bloc-title">La comparaison — cœur du détecteur</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Nouvelles machines = intrus potentiels</span></div>
+        <div><span class="c-kw">for</span> <span class="c-var">ip</span>, <span class="c-var">machine</span> <span class="c-kw">in</span> <span class="c-var">machines_actuelles</span>.<span class="c-fn">items</span>():</div>
+        <div>&nbsp;&nbsp;<span class="c-kw">if</span> <span class="c-var">ip</span> <span class="c-kw">not in</span> <span class="c-var">machines_connues</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-comment"># → ALERTE !</span></div>
+        <div style="margin-top:8px"><span class="c-comment"># Machines disparues</span></div>
+        <div><span class="c-kw">for</span> <span class="c-var">ip</span>, <span class="c-var">machine</span> <span class="c-kw">in</span> <span class="c-var">machines_connues</span>.<span class="c-fn">items</span>():</div>
+        <div>&nbsp;&nbsp;<span class="c-kw">if</span> <span class="c-var">ip</span> <span class="c-kw">not in</span> <span class="c-var">machines_actuelles</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-comment"># → Machine disparue</span></div>
+      </div>
+      <div class="annotation">
+        <code>.items()</code> retourne les paires clé/valeur d'un dictionnaire — ici l'IP et les infos de la machine.<br><br>
+        <code>not in</code> vérifie si quelque chose n'est PAS dans une liste ou un dictionnaire. C'est l'inverse de <code>in</code> que tu connais déjà.<br><br>
+        La logique : si une IP du scan actuel n'est pas dans la liste des connues → c'est un intrus.
+      </div>
+    </div>
+  </div>
+
+  <!-- OS.PATH -->
+  <div class="section" id="s-os">
+    <div class="bloc">
+      <div class="bloc-title">import os — interagir avec le système</div>
+      <div class="code-block">
+        <div><span class="c-kw">import</span> <span class="c-var">os</span></div>
+        <div style="margin-top:8px"><span class="c-comment"># Vérifier si un fichier existe</span></div>
+        <div><span class="c-var">os</span>.<span class="c-var">path</span>.<span class="c-fn">exists</span>(<span class="c-str">"machines_connues.json"</span>)</div>
+        <div style="margin-top:8px"><span class="c-comment"># Résultat : True ou False</span></div>
+      </div>
+      <div class="annotation">
+        Le module <code>os</code> permet d'interagir avec le système d'exploitation — lire des fichiers, vérifier leur existence, naviguer dans les dossiers.<br><br>
+        <code>os.path.exists()</code> retourne <code>True</code> si le fichier existe, <code>False</code> sinon. On l'utilise pour savoir si c'est le premier lancement ou non.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">datetime — horodater les alertes</div>
+      <div class="code-block">
+        <div><span class="c-kw">from</span> datetime <span class="c-kw">import</span> datetime</div>
+        <div><span class="c-var">datetime</span>.<span class="c-fn">now</span>().<span class="c-fn">strftime</span>(<span class="c-str">"%d/%m/%Y %H:%M:%S"</span>)</div>
+        <div><span class="c-comment"># → "31/05/2026 14:23:45"</span></div>
+      </div>
+      <div class="annotation"><code>datetime.now()</code> donne la date et l'heure exacte. <code>strftime</code> la formate en texte lisible. Chaque alerte est ainsi horodatée — essentiel pour un vrai journal de sécurité.</div>
+    </div>
+  </div>
+
+  <!-- REEL -->
+  <div class="section" id="s-reel">
+    <div class="bloc">
+      <div class="bloc-title">Lien avec la vraie cybersécurité</div>
+      <div class="annotation" style="margin-top:0">
+        Ce que tu construis s'appelle un <strong>IDS — Intrusion Detection System</strong>. C'est un des outils fondamentaux de la cybersécurité en entreprise.<br><br>
+        Les vrais IDS comme <strong>Snort</strong> ou <strong>Suricata</strong> font exactement la même chose mais en temps réel et avec des règles bien plus complexes.<br><br>
+        Ton détecteur fait :<br>
+        → Inventaire du réseau<br>
+        → Comparaison avec la liste blanche<br>
+        → Génération d'alertes horodatées<br>
+        → Sauvegarde du journal<br><br>
+        C'est la base de tout système de surveillance réseau professionnel. En mentionnant "IDS" dans ton dossier Parcoursup, les jurys de cybersécurité verront que tu connais les concepts réels du domaine.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

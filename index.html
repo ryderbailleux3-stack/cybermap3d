@@ -5,7 +5,7 @@
   <title>CyberMap 3D</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0a0a1a; overflow: hidden; font-family: monospace; }
+    body { background: #121249; overflow: hidden; font-family: monospace; }
     #ui { position: absolute; top: 20px; left: 20px; color: #00ff88; font-size: 14px; }
     #ui h1 { font-size: 18px; margin-bottom: 10px; }
     #btn-attaque {
@@ -14,23 +14,26 @@
       color: #ff4444; font-family: monospace; font-size: 13px;
       cursor: pointer; border-radius: 4px;
     }
+    #btn-parefeu {
+      margin-top: 8px; padding: 8px 18px;
+      background: transparent; border: 1px solid #00ff88;
+      color: #00ff88; font-family: monospace; font-size: 13px;
+      cursor: pointer; border-radius: 4px; display: none;
+    }
     #btn-attaque:hover { background: #ff444422; }
+    #btn-parefeu:hover { background: #00ff8822; }
     #legende { position: absolute; bottom: 20px; left: 20px; color: #888; font-size: 12px; line-height: 1.8; }
     #chargement { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #00ff88; font-size: 16px; }
     #fiche {
       position: absolute; top: 20px; right: 20px;
       background: #0d1117; border: 1px solid #00ff8844;
       border-radius: 8px; padding: 16px; width: 260px;
-      color: #cdd6f4; font-size: 13px; line-height: 1.8;
-      display: none;
+      color: #cdd6f4; font-size: 13px; line-height: 1.8; display: none;
     }
     #fiche h2 { color: #00ff88; font-size: 14px; margin-bottom: 8px; }
     #fiche .port { color: #fab387; }
     #fiche .os { color: #89b4fa; }
-    #fiche .fermer {
-      float: right; cursor: pointer; color: #888;
-      font-size: 16px; margin-top: -4px;
-    }
+    #fiche .fermer { float: right; cursor: pointer; color: #888; font-size: 16px; margin-top: -4px; }
   </style>
 </head>
 <body>
@@ -40,9 +43,10 @@
     <div id="nb-machines">Réseau : 0 machines</div>
     <div id="statut">Statut : ✓ Tout est sain</div>
     <button id="btn-attaque" onclick="lancerAttaque()">⚠ Lancer l'attaque</button>
+    <button id="btn-parefeu" onclick="activerParefeu()">🛡 Activer le pare-feu</button>
   </div>
   <div id="legende" style="display:none">
-    ■ Vert = Sain &nbsp;&nbsp; ■ Rouge = Infecté<br>
+    ■ Vert = Sain &nbsp;&nbsp; ■ Rouge = Infecté &nbsp;&nbsp; ■ Orange = Stoppé<br>
     💡 Clique sur une machine pour voir ses infos
   </div>
   <div id="fiche">
@@ -60,6 +64,8 @@
   <script>
     const meshes = [];
     const objets3D = [];
+    let attaqueInterval = null;
+    let attaqueEnCours = false;
 
     async function init() {
       const scene = new THREE.Scene();
@@ -124,7 +130,7 @@
         const type = modeles[m.type] ? m.type : "pc";
         const modele = modeles[type].clone();
         modele.scale.set(20, 20, 20);
-        modele.rotation.x = -Math.PI / 2;
+        modele.rotation.x = -Math.PI*4;
         modele.position.set(...m.pos);
         teindreMesh(modele, 0x00ff88);
         scene.add(modele);
@@ -147,7 +153,6 @@
       camera.position.set(0, 12, 8);
       camera.lookAt(0, 0, 0);
 
-      // Clic sur une machine
       const raycaster = new THREE.Raycaster();
       const souris = new THREE.Vector2();
 
@@ -155,21 +160,16 @@
         souris.x = (event.clientX / window.innerWidth) * 2 - 1;
         souris.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(souris, camera);
-
         const cibles = [];
         objets3D.forEach(({ objet, index }) => {
           objet.traverse(child => {
             if (child.isMesh) cibles.push({ mesh: child, index });
           });
         });
-
         const intersections = raycaster.intersectObjects(cibles.map(c => c.mesh));
         if (intersections.length > 0) {
           const clique = cibles.find(c => c.mesh === intersections[0].object);
-          if (clique !== undefined) {
-            const m = machines[clique.index];
-            afficherFiche(m);
-          }
+          if (clique !== undefined) afficherFiche(machines[clique.index]);
         }
       });
 
@@ -177,7 +177,6 @@
         document.getElementById("fiche-nom").innerText = "🖥 " + m.nom;
         document.getElementById("fiche-ip").innerText = "IP : " + m.ip;
         document.getElementById("fiche-os").innerText = "OS : " + m.os;
-
         let portsHTML = "";
         if (m.ports && m.ports.length > 0) {
           portsHTML = "<br><strong>Ports ouverts :</strong><br>";
@@ -207,11 +206,14 @@
 
     function lancerAttaque() {
       document.getElementById("btn-attaque").disabled = true;
+      document.getElementById("btn-parefeu").style.display = "block";
       document.getElementById("statut").innerText = "Statut : 🔴 Attaque en cours...";
+      attaqueEnCours = true;
       let i = 0;
-      const intervalle = setInterval(() => {
+      attaqueInterval = setInterval(() => {
         if (i >= meshes.length) {
-          clearInterval(intervalle);
+          clearInterval(attaqueInterval);
+          attaqueEnCours = false;
           document.getElementById("statut").innerText = "Statut : ☣ Réseau compromis !";
           return;
         }
@@ -220,6 +222,25 @@
         });
         i++;
       }, 1000);
+    }
+
+    function activerParefeu() {
+      clearInterval(attaqueInterval);
+      attaqueEnCours = false;
+      document.getElementById("btn-parefeu").disabled = true;
+      document.getElementById("statut").innerText = "Statut : 🛡 Pare-feu activé !";
+      meshes.forEach(m => {
+        m.modele.traverse(child => {
+          if (child.isMesh) {
+            const hex = child.material.color.getHex();
+            if (hex === 0xff2222) {
+              child.material = new THREE.MeshPhongMaterial({ color: 0xff8800 });
+            } else {
+              child.material = new THREE.MeshPhongMaterial({ color: 0x00ff88 });
+            }
+          }
+        });
+      });
     }
 
     init();
