@@ -1,30 +1,97 @@
 [
     {
         "id": 1,
-        "nom": "PC-Bureau",
-        "ip": "192.168.1.10",
+        "nom": "Host-003.lan",
+        "ip": "192.168.1.105",
         "type": "pc",
-        "infecte": true
+        "os": "Inconnu",
+        "ports": [],
+        "infecte": false
     },
     {
         "id": 2,
-        "nom": "Serveur-Web",
-        "ip": "192.168.1.20",
-        "type": "serveur",
-        "infecte": true
+        "nom": "Hugo.lan",
+        "ip": "192.168.1.140",
+        "type": "pc",
+        "os": "Microsoft Windows 11 24H2 - 25H2",
+        "ports": [
+            {
+                "port": 135,
+                "service": "msrpc",
+                "version": ""
+            },
+            {
+                "port": 139,
+                "service": "netbios-ssn",
+                "version": ""
+            },
+            {
+                "port": 445,
+                "service": "microsoft-ds",
+                "version": ""
+            }
+        ],
+        "infecte": false
     },
     {
         "id": 3,
-        "nom": "Routeur",
-        "ip": "192.168.1.1",
-        "type": "routeur",
-        "infecte": true
+        "nom": "Pixel-8-Hugo.lan",
+        "ip": "192.168.1.173",
+        "type": "pc",
+        "os": "Inconnu",
+        "ports": [],
+        "infecte": false
     },
     {
         "id": 4,
-        "nom": "PC-Portable",
-        "ip": "192.168.1.11",
+        "nom": "Host-002.lan",
+        "ip": "192.168.1.174",
         "type": "pc",
-        "infecte": true
+        "os": "Inconnu",
+        "ports": [],
+        "infecte": false
+    },
+    {
+        "id": 5,
+        "nom": "bbox.lan",
+        "ip": "192.168.1.254",
+        "type": "pc",
+        "os": "IPFire 2.25 firewall (Linux 4.14)",
+        "ports": [
+            {
+                "port": 53,
+                "service": "domain",
+                "version": "2.75"
+            },
+            {
+                "port": 80,
+                "service": "http",
+                "version": ""
+            },
+            {
+                "port": 443,
+                "service": "http",
+                "version": ""
+            }
+        ],
+        "infecte": false
+    },
+    {
+        "id": 6,
+        "nom": "Host-001.lan",
+        "ip": "192.168.1.31",
+        "type": "pc",
+        "os": "Inconnu",
+        "ports": [],
+        "infecte": false
+    },
+    {
+        "id": 7,
+        "nom": "Bouygtel4K-272011322502673.lan",
+        "ip": "192.168.1.64",
+        "type": "pc",
+        "os": "Inconnu",
+        "ports": [],
+        "infecte": false
     }
 ]
