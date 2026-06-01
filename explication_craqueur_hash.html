@@ -1,0 +1,165 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.schema-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 13px; }
+.schema-box { padding: 6px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 120px; text-align: center; }
+.arrow { color: var(--color-text-tertiary); font-size: 18px; }
+.schema-desc { color: var(--color-text-secondary); font-size: 12px; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('hash')">C'est quoi un hash</button>
+    <button class="nav-btn" onclick="show('algos')">Les algorithmes</button>
+    <button class="nav-btn" onclick="show('dico')">Attaque dico</button>
+    <button class="nav-btn" onclick="show('code')">Le code</button>
+    <button class="nav-btn" onclick="show('reel')">Lien réel</button>
+  </div>
+
+  <!-- HASH -->
+  <div class="section active" id="s-hash">
+    <div class="bloc">
+      <div class="bloc-title">C'est quoi un hash ?</div>
+      <div class="annotation" style="margin-top:0">
+        Un <strong>hash</strong> c'est une empreinte numérique d'un texte. Quand tu entres un mot de passe sur un site, le site ne stocke jamais le mot de passe en clair — il stocke son hash.<br><br>
+        C'est une fonction à <strong>sens unique</strong> :<br>
+        → "admin" → <code>21232f297a57a5a743894a0e4a801fc3</code><br>
+        → Impossible de retrouver "admin" depuis le hash<br><br>
+        Propriétés d'un bon hash :<br>
+        → Le même texte donne toujours le même hash<br>
+        → Un seul caractère différent change tout le hash<br>
+        → Impossible de revenir en arrière (théoriquement)
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Pourquoi c'est utile en sécurité ?</div>
+      <div class="annotation" style="margin-top:0">
+        Si un hacker vole la base de données d'un site, il ne voit que des hashs — pas les vrais mots de passe. Pour se connecter il doit retrouver le mot de passe original, ce qui est difficile... mais pas impossible pour les mots de passe faibles !
+      </div>
+    </div>
+  </div>
+
+  <!-- ALGOS -->
+  <div class="section" id="s-algos">
+    <div class="bloc">
+      <div class="bloc-title">Les différents algorithmes de hash</div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAECE7;color:#712B13">MD5</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">32 caractères. Rapide mais <strong>obsolète et non sécurisé</strong> — à éviter !</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAEEDA;color:#633806">SHA1</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">40 caractères. Également obsolète depuis 2017</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#E1F5EE;color:#085041">SHA256</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">64 caractères. Standard actuel — beaucoup plus sécurisé</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#EEEDFE;color:#3C3489">bcrypt</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Conçu spécialement pour les mots de passe — le meilleur choix</div>
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Comment créer un hash en Python</div>
+      <div class="code-block">
+        <div><span class="c-kw">import</span> hashlib</div>
+        <div style="margin-top:8px"><span class="c-var">h</span> = <span class="c-var">hashlib</span>.<span class="c-fn">new</span>(<span class="c-str">"md5"</span>)</div>
+        <div><span class="c-var">h</span>.<span class="c-fn">update</span>(<span class="c-str">"admin"</span>.<span class="c-fn">encode</span>(<span class="c-str">"utf-8"</span>))</div>
+        <div><span class="c-var">resultat</span> = <span class="c-var">h</span>.<span class="c-fn">hexdigest</span>()</div>
+        <div><span class="c-comment"># → "21232f297a57a5a743894a0e4a801fc3"</span></div>
+      </div>
+      <div class="annotation"><code>encode("utf-8")</code> convertit le texte en bytes — hashlib travaille avec des bytes pas du texte. <code>hexdigest()</code> retourne le hash en hexadécimal lisible.</div>
+    </div>
+  </div>
+
+  <!-- DICO -->
+  <div class="section" id="s-dico">
+    <div class="bloc">
+      <div class="bloc-title">L'attaque par dictionnaire</div>
+      <div class="annotation" style="margin-top:0">
+        Une <strong>attaque par dictionnaire</strong> c'est simple — on prend une liste de mots de passe courants, on calcule leur hash, et on compare avec le hash cible.<br><br>
+        Si le hash correspond → on a trouvé le mot de passe !<br><br>
+        C'est efficace car les gens utilisent des mots de passe prévisibles. Les 10 mots de passe les plus utilisés au monde sont toujours les mêmes : 123456, password, admin...
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">La logique de comparaison</div>
+      <div class="code-block">
+        <div><span class="c-kw">for</span> <span class="c-var">mot</span> <span class="c-kw">in</span> <span class="c-var">dictionnaire</span>:</div>
+        <div>&nbsp;&nbsp;<span class="c-var">hash_essai</span> = <span class="c-fn">hasher</span>(<span class="c-var">mot</span>)</div>
+        <div>&nbsp;&nbsp;<span class="c-kw">if</span> <span class="c-var">hash_essai</span> == <span class="c-var">hash_cible</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">f"Trouvé : {mot}"</span>)</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-var">mot</span></div>
+      </div>
+      <div class="annotation">On calcule le hash de chaque mot du dictionnaire et on compare avec le hash cible. Si les deux hashs sont identiques → le mot de passe est trouvé ! C'est aussi simple que ça.</div>
+    </div>
+  </div>
+
+  <!-- CODE -->
+  <div class="section" id="s-code">
+    <div class="bloc">
+      <div class="bloc-title">enumerate() — compter et parcourir en même temps</div>
+      <div class="code-block">
+        <div><span class="c-kw">for</span> <span class="c-var">i</span>, <span class="c-var">mot</span> <span class="c-kw">in</span> <span class="c-fn">enumerate</span>(<span class="c-var">dictionnaire</span>):</div>
+        <div>&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">f"Essai {i+1} : {mot}"</span>)</div>
+      </div>
+      <div class="annotation"><code>enumerate()</code> donne un numéro à chaque élément — tu as déjà vu ça dans scanner_ports.py ! Ici on l'utilise pour afficher le numéro de tentative.</div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">time.time() — mesurer la durée</div>
+      <div class="code-block">
+        <div><span class="c-var">debut</span> = <span class="c-var">time</span>.<span class="c-fn">time</span>()</div>
+        <div><span class="c-comment"># ... craquage ...</span></div>
+        <div><span class="c-var">duree</span> = <span class="c-var">time</span>.<span class="c-fn">time</span>() - <span class="c-var">debut</span></div>
+        <div><span class="c-fn">print</span>(<span class="c-str">f"Trouvé en {duree:.3f} secondes"</span>)</div>
+      </div>
+      <div class="annotation"><code>time.time()</code> retourne le nombre de secondes depuis le 1er janvier 1970. En soustrayant le temps de début du temps de fin on obtient la durée exacte. <code>:.3f</code> affiche 3 décimales.</div>
+    </div>
+  </div>
+
+  <!-- REEL -->
+  <div class="section" id="s-reel">
+    <div class="bloc">
+      <div class="bloc-title">Lien avec la vraie cybersécurité</div>
+      <div class="annotation" style="margin-top:0">
+        En 2012, LinkedIn s'est fait voler 117 millions de mots de passe hashés en SHA1. En quelques jours, des hackers avaient cracké la majorité car les utilisateurs avaient des mots de passe faibles.<br><br>
+        Des outils comme <strong>Hashcat</strong> ou <strong>John the Ripper</strong> peuvent tester des <strong>milliards</strong> de mots de passe par seconde sur GPU — ton dictionnaire de 35 mots se craque en microsecondes !<br><br>
+        <strong>Comment se protéger :</strong><br>
+        → Utiliser un mot de passe long et aléatoire (+16 caractères)<br>
+        → Ne jamais réutiliser le même mot de passe<br>
+        → Utiliser un gestionnaire de mots de passe (Bitwarden, KeePass)<br>
+        → Activer l'authentification à deux facteurs partout<br><br>
+        Les sites modernes utilisent <strong>bcrypt</strong> ou <strong>Argon2</strong> qui sont intentionnellement lents — même avec un GPU puissant ça prend des années à craquer.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

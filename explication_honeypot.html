@@ -1,0 +1,162 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.schema-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 13px; }
+.schema-box { padding: 6px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 120px; text-align: center; }
+.arrow { color: var(--color-text-tertiary); font-size: 18px; }
+.schema-desc { color: var(--color-text-secondary); font-size: 12px; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('principe')">C'est quoi</button>
+    <button class="nav-btn" onclick="show('socket')">Socket</button>
+    <button class="nav-btn" onclick="show('serveurs')">Les 3 serveurs</button>
+    <button class="nav-btn" onclick="show('thread')">Threading</button>
+    <button class="nav-btn" onclick="show('reel')">Lien réel</button>
+  </div>
+
+  <!-- PRINCIPE -->
+  <div class="section active" id="s-principe">
+    <div class="bloc">
+      <div class="bloc-title">C'est quoi un honeypot ?</div>
+      <div class="annotation" style="margin-top:0">
+        Un <strong>honeypot</strong> (pot de miel) c'est un faux serveur conçu pour attirer les hackers. Il simule des services réels — SSH, FTP, HTTP — mais enregistre tout ce que les attaquants tentent de faire.<br><br>
+        C'est comme laisser une fausse porte ouverte avec une caméra cachée derrière. Le hacker croit avoir trouvé une cible facile, mais en réalité il se fait surveiller et toutes ses tentatives sont enregistrées.<br><br>
+        Les entreprises utilisent des honeypots pour :<br>
+        → Détecter les attaques tôt<br>
+        → Étudier les techniques des hackers<br>
+        → Détourner les attaquants des vrais serveurs
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Les 3 faux serveurs qu'on crée</div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#EEEDFE;color:#3C3489">SSH port 2222</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Simule un accès à distance sécurisé — cible favorite des hackers</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#E1F5EE;color:#085041">HTTP port 8080</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Simule un panneau d'administration web — très attractif</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAEEDA;color:#633806">FTP port 2121</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Simule un serveur de fichiers — enregistre les tentatives de login</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOCKET -->
+  <div class="section" id="s-socket">
+    <div class="bloc">
+      <div class="bloc-title">C'est quoi un socket ?</div>
+      <div class="annotation" style="margin-top:0">
+        Un <strong>socket</strong> c'est un point de communication réseau — comme une prise électrique mais pour les données. Chaque connexion réseau utilise des sockets des deux côtés : un côté serveur qui attend, un côté client qui se connecte.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Créer et écouter un socket</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Créer le socket</span></div>
+        <div><span class="c-var">serveur</span> = <span class="c-var">socket</span>.<span class="c-fn">socket</span>(<span class="c-var">socket</span>.<span class="c-var">AF_INET</span>, <span class="c-var">socket</span>.<span class="c-var">SOCK_STREAM</span>)</div>
+        <div style="margin-top:6px"><span class="c-comment"># Attacher à un port</span></div>
+        <div><span class="c-var">serveur</span>.<span class="c-fn">bind</span>((<span class="c-str">"0.0.0.0"</span>, <span class="c-num">2222</span>))</div>
+        <div style="margin-top:6px"><span class="c-comment"># Écouter les connexions</span></div>
+        <div><span class="c-var">serveur</span>.<span class="c-fn">listen</span>(<span class="c-num">5</span>)</div>
+        <div style="margin-top:6px"><span class="c-comment"># Accepter une connexion</span></div>
+        <div><span class="c-var">client</span>, <span class="c-var">adresse</span> = <span class="c-var">serveur</span>.<span class="c-fn">accept</span>()</div>
+      </div>
+      <div class="annotation">
+        <code>AF_INET</code> → utilise IPv4<br>
+        <code>SOCK_STREAM</code> → utilise TCP<br>
+        <code>"0.0.0.0"</code> → écoute sur toutes les interfaces réseau<br>
+        <code>listen(5)</code> → accepte jusqu'à 5 connexions en attente<br>
+        <code>accept()</code> → attend qu'un client se connecte — bloque jusqu'à ce que quelqu'un arrive
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVEURS -->
+  <div class="section" id="s-serveurs">
+    <div class="bloc">
+      <div class="bloc-title">Le faux serveur SSH</div>
+      <div class="code-block">
+        <div><span class="c-comment"># Envoyer une fausse bannière SSH</span></div>
+        <div><span class="c-var">client</span>.<span class="c-fn">send</span>(<span class="c-str">b"SSH-2.0-OpenSSH_8.2p1 Ubuntu\r\n"</span>)</div>
+        <div><span class="c-comment"># Recevoir la réponse du hacker</span></div>
+        <div><span class="c-var">data</span> = <span class="c-var">client</span>.<span class="c-fn">recv</span>(<span class="c-num">1024</span>)</div>
+        <div><span class="c-fn">logger</span>(<span class="c-var">ip</span>, <span class="c-var">port</span>, <span class="c-str">f"SSH: {data[:50]}"</span>)</div>
+      </div>
+      <div class="annotation">On envoie une vraie bannière SSH d'Ubuntu pour tromper l'attaquant. Il croit se connecter à un vrai serveur Linux. Le <code>b"..."</code> c'est une chaîne en bytes — le format brut du réseau. <code>recv(1024)</code> reçoit jusqu'à 1024 bytes de données.</div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Le faux serveur FTP</div>
+      <div class="code-block">
+        <div><span class="c-var">client</span>.<span class="c-fn">send</span>(<span class="c-str">b"220 FTP Server Ready\r\n"</span>)</div>
+        <div><span class="c-var">data</span> = <span class="c-var">client</span>.<span class="c-fn">recv</span>(<span class="c-num">1024</span>) <span class="c-comment"># login</span></div>
+        <div><span class="c-var">client</span>.<span class="c-fn">send</span>(<span class="c-str">b"331 Password required\r\n"</span>)</div>
+        <div><span class="c-var">data2</span> = <span class="c-var">client</span>.<span class="c-fn">recv</span>(<span class="c-num">1024</span>) <span class="c-comment"># mot de passe</span></div>
+        <div><span class="c-fn">logger</span>(<span class="c-var">ip</span>, <span class="c-var">port</span>, <span class="c-str">f"FTP mot de passe: {data2}"</span>)</div>
+      </div>
+      <div class="annotation">Le FTP demande un login puis un mot de passe. On enregistre les deux — si un hacker essaie des mots de passe courants comme "admin/admin" ou "root/root" on le verra dans les logs !</div>
+    </div>
+  </div>
+
+  <!-- THREAD -->
+  <div class="section" id="s-thread">
+    <div class="bloc">
+      <div class="bloc-title">Threading — faire plusieurs choses en même temps</div>
+      <div class="code-block">
+        <div><span class="c-var">t1</span> = <span class="c-var">threading</span>.<span class="c-fn">Thread</span>(<span class="c-var">target</span>=<span class="c-var">honeypot_ssh</span>,  <span class="c-var">daemon</span>=<span class="c-kw">True</span>)</div>
+        <div><span class="c-var">t2</span> = <span class="c-var">threading</span>.<span class="c-fn">Thread</span>(<span class="c-var">target</span>=<span class="c-var">honeypot_http</span>, <span class="c-var">daemon</span>=<span class="c-kw">True</span>)</div>
+        <div><span class="c-var">t3</span> = <span class="c-var">threading</span>.<span class="c-fn">Thread</span>(<span class="c-var">target</span>=<span class="c-var">honeypot_ftp</span>,  <span class="c-var">daemon</span>=<span class="c-kw">True</span>)</div>
+        <div style="margin-top:8px"><span class="c-var">t1</span>.<span class="c-fn">start</span>()</div>
+        <div><span class="c-var">t2</span>.<span class="c-fn">start</span>()</div>
+        <div><span class="c-var">t3</span>.<span class="c-fn">start</span>()</div>
+      </div>
+      <div class="annotation">
+        Un programme Python normal fait une chose à la fois. Mais on veut écouter 3 ports <strong>simultanément</strong>. Le <strong>threading</strong> permet de lancer plusieurs tâches en parallèle — chaque thread est comme un employé qui travaille en même temps que les autres.<br><br>
+        <code>daemon=True</code> → le thread s'arrête automatiquement quand le programme principal s'arrête.
+      </div>
+    </div>
+  </div>
+
+  <!-- REEL -->
+  <div class="section" id="s-reel">
+    <div class="bloc">
+      <div class="bloc-title">Lien avec la vraie cybersécurité</div>
+      <div class="annotation" style="margin-top:0">
+        Les vrais honeypots comme <strong>Cowrie</strong> ou <strong>Dionaea</strong> font exactement ça mais de façon beaucoup plus sophistiquée — ils simulent un vrai système complet avec un vrai shell interactif.<br><br>
+        Des organisations comme l'ANSSI (Agence Nationale de Sécurité des Systèmes d'Information) en France utilisent des honeypots pour surveiller les nouvelles techniques d'attaque et alerter les entreprises.<br><br>
+        Ce que tu construis c'est un <strong>low-interaction honeypot</strong> — il simule juste les bannières et premiers échanges. Un <strong>high-interaction honeypot</strong> simulerait un vrai système complet — beaucoup plus risqué car le hacker pourrait l'utiliser comme tremplin.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

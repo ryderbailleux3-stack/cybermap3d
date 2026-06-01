@@ -1,0 +1,175 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.schema-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 13px; }
+.schema-box { padding: 6px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 120px; text-align: center; }
+.arrow { color: var(--color-text-tertiary); font-size: 18px; }
+.schema-desc { color: var(--color-text-secondary); font-size: 12px; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('scapy')">Scapy</button>
+    <button class="nav-btn" onclick="show('sniff')">sniff()</button>
+    <button class="nav-btn" onclick="show('protocoles')">Protocoles</button>
+    <button class="nav-btn" onclick="show('dns')">DNS</button>
+    <button class="nav-btn" onclick="show('reel')">Lien réel</button>
+  </div>
+
+  <!-- SCAPY -->
+  <div class="section active" id="s-scapy">
+    <div class="bloc">
+      <div class="bloc-title">C'est quoi Scapy ?</div>
+      <div class="annotation" style="margin-top:0">
+        Scapy est une bibliothèque Python ultra-puissante pour manipuler les paquets réseau. Un <strong>paquet</strong> c'est une petite enveloppe de données qui voyage sur le réseau — tout ce que fait ton téléphone (ouvrir une app, envoyer un message, charger une page) génère des paquets.<br><br>
+        Scapy permet de :<br>
+        → <strong>Capturer</strong> les paquets qui circulent<br>
+        → <strong>Analyser</strong> leur contenu<br>
+        → <strong>Créer</strong> des paquets personnalisés<br>
+        → <strong>Envoyer</strong> des paquets sur le réseau<br><br>
+        C'est l'outil numéro 1 des chercheurs en sécurité réseau.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Les imports</div>
+      <div class="code-block">
+        <div><span class="c-kw">from</span> scapy.all <span class="c-kw">import</span> sniff, IP, TCP, UDP, DNS, DNSQR</div>
+      </div>
+      <div class="annotation">
+        <strong>sniff</strong> → la fonction qui capture les paquets<br>
+        <strong>IP</strong> → couche réseau (adresses IP)<br>
+        <strong>TCP</strong> → protocole de transport fiable (sites web, SSH...)<br>
+        <strong>UDP</strong> → protocole rapide (streaming, jeux...)<br>
+        <strong>DNS</strong> → système de noms de domaine<br>
+        <strong>DNSQR</strong> → requête DNS spécifique
+      </div>
+    </div>
+  </div>
+
+  <!-- SNIFF -->
+  <div class="section" id="s-sniff">
+    <div class="bloc">
+      <div class="bloc-title">La fonction sniff() — écouter le réseau</div>
+      <div class="code-block">
+        <div><span class="c-fn">sniff</span>(</div>
+        <div>&nbsp;&nbsp;<span class="c-var">filter</span>=<span class="c-str">f"host {IP_TELEPHONE}"</span>, <span class="c-comment"># filtre par IP</span></div>
+        <div>&nbsp;&nbsp;<span class="c-var">prn</span>=<span class="c-var">analyser_paquet</span>,        <span class="c-comment"># fonction appelée à chaque paquet</span></div>
+        <div>&nbsp;&nbsp;<span class="c-var">store</span>=<span class="c-num">0</span>                       <span class="c-comment"># ne stocke pas en mémoire</span></div>
+        <div>)</div>
+      </div>
+      <div class="annotation">
+        <code>sniff()</code> est une boucle infinie qui écoute tout le trafic réseau. Pour chaque paquet capturé elle appelle automatiquement la fonction <code>analyser_paquet</code>.<br><br>
+        <code>filter="host X"</code> utilise la syntaxe BPF (Berkeley Packet Filter) pour ne capturer que les paquets de/vers une IP spécifique — sinon on verrait tout le trafic du réseau.<br><br>
+        <code>store=0</code> → ne garde pas les paquets en mémoire RAM, sinon après des milliers de paquets le PC manquerait de mémoire.
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Vérifier si un paquet contient une couche</div>
+      <div class="code-block">
+        <div><span class="c-kw">if</span> <span class="c-var">paquet</span>.<span class="c-fn">haslayer</span>(<span class="c-var">IP</span>):</div>
+        <div>&nbsp;&nbsp;<span class="c-var">src</span> = <span class="c-var">paquet</span>[<span class="c-var">IP</span>].<span class="c-var">src</span>  <span class="c-comment"># IP source</span></div>
+        <div>&nbsp;&nbsp;<span class="c-var">dst</span> = <span class="c-var">paquet</span>[<span class="c-var">IP</span>].<span class="c-var">dst</span>  <span class="c-comment"># IP destination</span></div>
+      </div>
+      <div class="annotation">Un paquet réseau est comme une <strong>poupée gigogne</strong> — il contient plusieurs couches empilées. <code>haslayer(IP)</code> vérifie si la couche IP est présente. <code>paquet[IP].src</code> lit l'adresse source dans cette couche.</div>
+    </div>
+  </div>
+
+  <!-- PROTOCOLES -->
+  <div class="section" id="s-protocoles">
+    <div class="bloc">
+      <div class="bloc-title">Les protocoles réseau</div>
+      <div class="annotation" style="margin-top:0">
+        Chaque type de communication utilise un protocole différent. C'est comme différents langages selon ce qu'on veut dire.
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#E1F5EE;color:#085041">DNS</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Traduit un nom de site en IP. Ex : "google.com" → "142.250.74.46"</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#EEEDFE;color:#3C3489">TCP</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Transport fiable — sites web, emails, SSH. Garantit que les données arrivent</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAEEDA;color:#633806">UDP</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Transport rapide — streaming, jeux, appels vidéo. Priorité à la vitesse</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAECE7;color:#712B13">HTTPS 443</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Web sécurisé — contenu chiffré, on voit la destination mais pas le contenu</div>
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Identifier le service par le port</div>
+      <div class="code-block">
+        <div><span class="c-var">services</span> = {</div>
+        <div>&nbsp;&nbsp;<span class="c-num">80</span>: <span class="c-str">"HTTP"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-num">443</span>: <span class="c-str">"HTTPS"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-num">22</span>: <span class="c-str">"SSH"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-num">25</span>: <span class="c-str">"Email"</span>,</div>
+        <div>}</div>
+        <div><span class="c-var">service</span> = <span class="c-var">services</span>.<span class="c-fn">get</span>(<span class="c-var">port</span>, <span class="c-str">f"Port {port}"</span>)</div>
+      </div>
+      <div class="annotation"><code>.get(clé, valeur_par_défaut)</code> cherche une clé dans un dictionnaire. Si elle n'existe pas il retourne la valeur par défaut — ici le numéro de port brut.</div>
+    </div>
+  </div>
+
+  <!-- DNS -->
+  <div class="section" id="s-dns">
+    <div class="bloc">
+      <div class="bloc-title">Le DNS — voir quels sites visite ton téléphone</div>
+      <div class="code-block">
+        <div><span class="c-kw">if</span> <span class="c-var">paquet</span>.<span class="c-fn">haslayer</span>(<span class="c-var">DNS</span>) <span class="c-kw">and</span> <span class="c-var">paquet</span>.<span class="c-fn">haslayer</span>(<span class="c-var">DNSQR</span>):</div>
+        <div>&nbsp;&nbsp;<span class="c-var">domaine</span> = <span class="c-var">paquet</span>[<span class="c-var">DNSQR</span>].<span class="c-var">qname</span>.<span class="c-fn">decode</span>(<span class="c-str">"utf-8"</span>).<span class="c-fn">rstrip</span>(<span class="c-str">"."</span>)</div>
+        <div>&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">f"🌐 DNS → {domaine}"</span>)</div>
+      </div>
+      <div class="annotation">
+        C'est la partie la plus intéressante ! Avant d'aller sur un site, ton téléphone envoie une requête DNS pour trouver son IP. En capturant ces requêtes on peut voir <strong>tous les domaines que visite ton téléphone</strong> — même ceux des apps en arrière-plan !<br><br>
+        <code>.decode("utf-8")</code> → convertit les bytes en texte lisible<br>
+        <code>.rstrip(".")</code> → supprime le point final que DNS ajoute automatiquement
+      </div>
+    </div>
+  </div>
+
+  <!-- REEL -->
+  <div class="section" id="s-reel">
+    <div class="bloc">
+      <div class="bloc-title">Lien avec la vraie cybersécurité</div>
+      <div class="annotation" style="margin-top:0">
+        Ce que tu fais s'appelle du <strong>packet sniffing</strong> ou <strong>network sniffing</strong>. C'est une technique fondamentale utilisée par :<br><br>
+        → Les <strong>administrateurs réseau</strong> pour diagnostiquer des problèmes<br>
+        → Les <strong>pentesters</strong> pour analyser le trafic d'une cible<br>
+        → Les <strong>hackers malveillants</strong> pour voler des données sur des réseaux non sécurisés<br><br>
+        C'est pour ça que le <strong>HTTPS</strong> est crucial — même si quelqu'un intercepte tes paquets, le contenu est chiffré et illisible. Tu verras le domaine mais pas ce que tu envoies.<br><br>
+        Sur un réseau Wi-Fi public non sécurisé, n'importe qui peut faire ce que tu fais maintenant — c'est pourquoi il ne faut jamais se connecter à son compte bancaire sur un Wi-Fi public !
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
