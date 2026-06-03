@@ -221,12 +221,29 @@
         });
       }
 
-      function animer() {
-        requestAnimationFrame(animer);
-        scene.rotation.y += 0.004;
-        mettreAJourLabels();
-        renderer.render(scene, camera);
+      let temps = 0;
+
+function animer() {
+  requestAnimationFrame(animer);
+  temps += 0.05;
+  scene.rotation.y += 0.004;
+
+  // Pulsation des machines infectées
+  meshes.forEach(m => {
+    m.modele.traverse(child => {
+      if (child.isMesh) {
+        const hex = child.material.color.getHex();
+        if (hex === 0xff2222) {
+          const scale = 20 + Math.sin(temps * 3) * 2;
+          m.modele.scale.set(scale, scale, scale);
+        }
       }
+    });
+  });
+
+  mettreAJourLabels();
+  renderer.render(scene, camera);
+}
       animer();
 
       window.addEventListener("resize", () => {
