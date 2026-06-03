@@ -83,6 +83,20 @@
 
     async function init() {
       const scene = new THREE.Scene();
+      // Fond etoile
+const etoilesGeo = new THREE.BufferGeometry();
+const etoilesPos = [];
+for (let i = 0; i < 2000; i++) {
+  etoilesPos.push(
+    (Math.random() - 0.5) * 200,
+    (Math.random() - 0.5) * 200,
+    (Math.random() - 0.5) * 200
+  );
+}
+etoilesGeo.setAttribute("position", new THREE.Float32BufferAttribute(etoilesPos, 3));
+const etoilesMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+const etoiles = new THREE.Points(etoilesGeo, etoilesMat);
+scene.add(etoiles);
       const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -165,6 +179,24 @@
           }
         });
       });
+      // Creer particules de trafic
+const particulesAnimees = [];
+machines.forEach(m => {
+  machines.forEach(cible => {
+    if (m !== cible) {
+      const geoP = new THREE.SphereGeometry(0.05, 4, 4);
+      const matP = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
+      const particle = new THREE.Mesh(geoP, matP);
+      scene.add(particle);
+      particulesAnimees.push({
+        mesh: particle,
+        debut: new THREE.Vector3(...m.pos),
+        fin: new THREE.Vector3(...cible.pos),
+        t: Math.random()
+      });
+    }
+  });
+});
 
       document.getElementById("chargement").style.display = "none";
       document.getElementById("ui").style.display = "block";
@@ -242,6 +274,12 @@ function animer() {
   });
 
   mettreAJourLabels();
+  // Animer les particules
+particulesAnimees.forEach(p => {
+  p.t += 0.005;
+  if (p.t > 1) p.t = 0;
+  p.mesh.position.lerpVectors(p.debut, p.fin, p.t);
+});
   renderer.render(scene, camera);
 }
       animer();
