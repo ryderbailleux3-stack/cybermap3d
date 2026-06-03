@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 import threading
 
-LOG_FILE = "honeypot_log.json"
+LOG_FILE = "../data/honeypot_log.json"
 tentatives = []
 
 def logger(ip, port, message):

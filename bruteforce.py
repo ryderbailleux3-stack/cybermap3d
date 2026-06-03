@@ -79,7 +79,7 @@ def bruteforce():
         for r in resultats:
             print(f"    {r['utilisateur']} : {r['mot_de_passe']}")
 
-    with open("bruteforce_log.json", "w") as f:
+    with open("../data/bruteforce_log.json", "w") as f:
         json.dump({
             "cible": f"{CIBLE}:{PORT}",
             "tentatives": tentatives,

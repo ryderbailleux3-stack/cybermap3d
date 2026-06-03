@@ -58,7 +58,7 @@ def analyser_paquet(paquet):
 
     # Sauvegarder toutes les 10 paquets
     if len(paquets_captures) % 10 == 0:
-        with open("trafic.json", "w") as f:
+       with open("../data/trafic.json", "w") as f:
             json.dump(paquets_captures, f, indent=4)
 
 print("🔍 Interception du trafic de ton téléphone...")
@@ -71,6 +71,6 @@ try:
     sniff(filter=f"host {IP_TELEPHONE}", prn=analyser_paquet, store=0)
 except KeyboardInterrupt:
     print(f"\n✅ Capture terminée — {len(paquets_captures)} paquets analysés")
-    with open("trafic.json", "w") as f:
+    with open("../data/trafic.json", "w") as f:
         json.dump(paquets_captures, f, indent=4)
     print("💾 Trafic sauvegardé dans trafic.json !")
