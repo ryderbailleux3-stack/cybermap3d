@@ -11,7 +11,6 @@ RACINE = os.path.dirname(os.path.abspath(__file__))
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # Generer le rapport PDF
         if self.path == "/generer-rapport":
             try:
                 script = os.path.join(RACINE, "core", "rapport.py")
@@ -28,7 +27,6 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({"succes": False, "message": str(e)}).encode())
 
-        # Scanner le reseau
         elif self.path == "/scanner":
             try:
                 script = os.path.join(RACINE, "core", "scanner_ports.py")
@@ -44,6 +42,27 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
                 self.wfile.write(json.dumps({"succes": False, "message": str(e)}).encode())
+
+        elif self.path == "/alertes":
+            try:
+                alertes_path = os.path.join(RACINE, "data", "alertes.json")
+                if os.path.exists(alertes_path):
+                    with open(alertes_path, "r") as f:
+                        alertes = f.read()
+                else:
+                    alertes = "[]"
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(alertes.encode())
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(json.dumps({"erreur": str(e)}).encode())
+
         else:
             self.send_response(404)
             self.end_headers()

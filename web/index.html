@@ -61,6 +61,32 @@
     #log .log-entry { color: #00ff88; }
     #log .log-rouge { color: #ff4444; }
     #log .log-orange { color: #ff8800; }
+    #alerte-intrus {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #ff000033; border: 2px solid #ff0000;
+      border-radius: 8px; padding: 20px 40px;
+      color: #ff0000; font-size: 20px; font-family: monospace;
+      display: none; text-align: center;
+      animation: clignoter 0.5s infinite;
+    }
+    @keyframes clignoter {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+    #radar {
+  position: absolute; bottom: 20px; right: 20px;
+  width: 120px; height: 120px;
+  border: 1px solid #00ff8844;
+  border-radius: 50%;
+  background: #0a0a1a99;
+  overflow: hidden;
+}
+#radar canvas {
+  width: 100%;
+  height: 100%;
+}
   </style>
 </head>
 <body>
@@ -87,6 +113,14 @@
     <div id="fiche-ports"></div>
   </div>
   <div id="log"></div>
+  <div id="alerte-intrus">
+    ALERTE INTRUS !<br>
+    <span id="alerte-detail" style="font-size:14px;"></span><br>
+    <button onclick="document.getElementById('alerte-intrus').style.display='none'"
+      style="margin-top:10px; padding:6px 16px; background:transparent; border:1px solid #ff0000; color:#ff0000; cursor:pointer; font-family:monospace;">
+      Ignorer
+    </button>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -111,10 +145,36 @@
       if (log.children.length > 8) log.removeChild(log.children[0]);
     }
 
+    async function mettreAJourReseau() {
+      try {
+        const reponse = await fetch("reseau.json?t=" + Date.now());
+        const nouvelles = await reponse.json();
+        if (nouvelles.length !== meshes.length) {
+          ajouterLog("Reseau mis a jour : " + nouvelles.length + " machines", "");
+          location.reload();
+        }
+      } catch(e) {
+        ajouterLog("Erreur mise a jour reseau", "rouge");
+      }
+    }
+
+    async function verifierIntrus() {
+      try {
+        const reponse = await fetch("http://localhost:8001/alertes");
+        const alertes = await reponse.json();
+        if (alertes.length > 0) {
+          const derniere = alertes[alertes.length - 1];
+          document.getElementById("alerte-detail").innerText =
+            derniere.ip + " — " + derniere.nom;
+          document.getElementById("alerte-intrus").style.display = "block";
+          ajouterLog("INTRUS DETECTE : " + derniere.ip, "rouge");
+        }
+      } catch(e) {}
+    }
+
     async function init() {
       const scene = new THREE.Scene();
 
-      // Fond etoile
       const etoilesGeo = new THREE.BufferGeometry();
       const etoilesPos = [];
       for (let i = 0; i < 2000; i++) {
@@ -125,9 +185,7 @@
         );
       }
       etoilesGeo.setAttribute("position", new THREE.Float32BufferAttribute(etoilesPos, 3));
-      const etoilesMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
-      const etoiles = new THREE.Points(etoilesGeo, etoilesMat);
-      scene.add(etoiles);
+      scene.add(new THREE.Points(etoilesGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 })));
 
       const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -138,9 +196,7 @@
       const lumiere = new THREE.PointLight(0xffffff, 2, 100);
       lumiere.position.set(10, 10, 10);
       scene.add(lumiere);
-      const lumiere2 = new THREE.PointLight(0x4444ff, 1, 100);
-      lumiere2.position.set(-10, -5, -10);
-      scene.add(lumiere2);
+      scene.add(new THREE.PointLight(0x4444ff, 1, 100)).position.set(-10, -5, -10);
 
       const reponse = await fetch("reseau.json");
       const donnees = await reponse.json();
@@ -192,15 +248,16 @@
         const modele = modeles[type].clone();
         modele.scale.set(20, 20, 20);
         if (m.type === "pc") {
-          modele.rotation.x = -Math.PI * 4;
-          modele.rotation.z = Math.PI / 2;
+          modele.rotation.x = -Math.PI *4;
+          modele.rotation.z = Math.PI *2;
         } else {
           modele.rotation.x = -Math.PI / 2;
         }
         modele.position.set(...m.pos);
         teindreMesh(modele, 0x00ff88);
         scene.add(modele);
-        meshes.push({ modele, machine: m });
+        const lignes = [];
+        meshes.push({ modele, machine: m, lignes });
         objets3D.push({ objet: modele, index: idx });
 
         const label = document.createElement("div");
@@ -213,12 +270,14 @@
           if (m !== cible) {
             const pts = [new THREE.Vector3(...m.pos), new THREE.Vector3(...cible.pos)];
             const geo_l = new THREE.BufferGeometry().setFromPoints(pts);
-            scene.add(new THREE.Line(geo_l, new THREE.LineBasicMaterial({ color: 0x223355 })));
+            const mat_l = new THREE.LineBasicMaterial({ color: 0x223355 });
+            const ligne = new THREE.Line(geo_l, mat_l);
+            scene.add(ligne);
+            lignes.push(ligne);
           }
         });
       });
 
-      // Particules de trafic
       machines.forEach(m => {
         machines.forEach(cible => {
           if (m !== cible) {
@@ -241,8 +300,8 @@
       document.getElementById("legende").style.display = "block";
       ajouterLog("Systeme CyberMap 3D demarre", "");
 
-      camera.position.set(0, 12, 8);
-      camera.lookAt(0, 0, 0);
+      camera.position.set(0, 14, 5);
+      camera.lookAt(-3, 5, 0);
 
       const raycaster = new THREE.Raycaster();
       const souris = new THREE.Vector2();
@@ -293,12 +352,97 @@
         });
       }
 
+      setInterval(mettreAJourReseau, 30000);
+      setInterval(verifierIntrus, 15000);
+      ajouterLog("Scanner automatique actif (30s)", "");
+      // Mini radar
+const radarCanvas = document.getElementById("radar-canvas");
+const radarCtx = radarCanvas.getContext("2d");
+const radarCentre = { x: 60, y: 60 };
+const radarRayon = 55;
+let radarAngle = 0;
+
+function dessinerRadar() {
+  radarCtx.clearRect(0, 0, 120, 120);
+
+  // Fond
+  radarCtx.beginPath();
+  radarCtx.arc(60, 60, radarRayon, 0, Math.PI * 2);
+  radarCtx.fillStyle = "#0a0a1a";
+  radarCtx.fill();
+
+  // Cercles
+  [20, 35, 55].forEach(r => {
+    radarCtx.beginPath();
+    radarCtx.arc(60, 60, r, 0, Math.PI * 2);
+    radarCtx.strokeStyle = "#00ff8822";
+    radarCtx.stroke();
+  });
+
+  // Croix
+  radarCtx.strokeStyle = "#00ff8822";
+  radarCtx.beginPath();
+  radarCtx.moveTo(60, 5); radarCtx.lineTo(60, 115);
+  radarCtx.moveTo(5, 60); radarCtx.lineTo(115, 60);
+  radarCtx.stroke();
+
+  // Balayage
+  const gradient = radarCtx.createConicalGradient
+    ? radarCtx.createConicalGradient(60, 60, radarAngle)
+    : null;
+
+  radarCtx.beginPath();
+  radarCtx.moveTo(60, 60);
+  radarCtx.arc(60, 60, radarRayon, radarAngle, radarAngle + 1.2);
+  radarCtx.closePath();
+  radarCtx.fillStyle = "#00ff8833";
+  radarCtx.fill();
+
+  // Ligne de balayage
+  radarCtx.beginPath();
+  radarCtx.moveTo(60, 60);
+  radarCtx.lineTo(
+    60 + Math.cos(radarAngle) * radarRayon,
+    60 + Math.sin(radarAngle) * radarRayon
+  );
+  radarCtx.strokeStyle = "#00ff88";
+  radarCtx.lineWidth = 1.5;
+  radarCtx.stroke();
+  radarCtx.lineWidth = 1;
+
+  // Points machines
+  meshes.forEach(m => {
+    const px = m.machine.pos[0];
+    const pz = m.machine.pos[2];
+    const rx = 60 + (px / 8) * radarRayon;
+    const ry = 60 + (pz / 8) * radarRayon;
+
+    let couleur = "#00ff88";
+    m.modele.traverse(child => {
+      if (child.isMesh) {
+        const hex = child.material.color.getHex();
+        if (hex === 0xff2222) couleur = "#ff2222";
+        else if (hex === 0xff8800) couleur = "#ff8800";
+      }
+    });
+
+    radarCtx.beginPath();
+    radarCtx.arc(rx, ry, 3, 0, Math.PI * 2);
+    radarCtx.fillStyle = couleur;
+    radarCtx.fill();
+  });
+
+  radarAngle += 0.03;
+  if (radarAngle > Math.PI * 2) radarAngle = 0;
+  requestAnimationFrame(dessinerRadar);
+}
+dessinerRadar();
+
       function animer() {
         requestAnimationFrame(animer);
         temps += 0.05;
         scene.rotation.y += 0.004;
 
-        // Pulsation machines infectees
         meshes.forEach(m => {
           m.modele.traverse(child => {
             if (child.isMesh && child.material.color.getHex() === 0xff2222) {
@@ -308,7 +452,6 @@
           });
         });
 
-        // Animer particules
         particulesAnimees.forEach(p => {
           p.t += 0.005;
           if (p.t > 1) p.t = 0;
@@ -346,6 +489,9 @@
         meshes[i].modele.traverse(child => {
           if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: 0xff2222 });
         });
+        if (meshes[i].lignes) {
+          meshes[i].lignes.forEach(l => l.material.color.setHex(0xff2222));
+        }
         infectees++;
         document.getElementById("compteur").innerText = "Infectees : " + infectees + " / " + meshes.length;
         ajouterLog("Machine infectee : " + meshes[i].machine.nom.split(".")[0], "rouge");
@@ -370,6 +516,12 @@
             }
           }
         });
+        if (m.lignes) {
+          m.lignes.forEach(l => {
+            const hex = l.material.color.getHex();
+            l.material.color.setHex(hex === 0xff2222 ? 0xff8800 : 0x223355);
+          });
+        }
       });
     }
 
@@ -388,6 +540,7 @@
           if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: 0x00ff88 });
         });
         m.modele.scale.set(20, 20, 20);
+        if (m.lignes) m.lignes.forEach(l => l.material.color.setHex(0x223355));
       });
     }
 
@@ -401,7 +554,7 @@
             ajouterLog("Rapport PDF genere !", "");
             alert("Rapport PDF genere dans le dossier rapports !");
           } else {
-            ajouterLog("Erreur rapport : " + data.message, "rouge");
+            ajouterLog("Erreur : " + data.message, "rouge");
           }
           document.getElementById("btn-rapport").innerText = "Generer rapport";
         })
@@ -413,5 +566,6 @@
 
     init();
   </script>
+  <div id="radar"><canvas id="radar-canvas" width="120" height="120"></canvas></div>
 </body>
 </html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberMap 3D</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a1a;
+      color: #00ff88;
+      font-family: monospace;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 0;
+    }
+    .contenu {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 20px #00ff88;
+      letter-spacing: 4px;
+    }
+    .sous-titre {
+      font-size: 16px;
+      color: #888;
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+    }
+    .description {
+      max-width: 600px;
+      font-size: 14px;
+      color: #cdd6f4;
+      line-height: 2;
+      margin-bottom: 40px;
+      text-align: left;
+    }
+    .description span {
+      color: #00ff88;
+    }
+    .stats {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin-bottom: 50px;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-nombre {
+      font-size: 32px;
+      color: #00ff88;
+      text-shadow: 0 0 10px #00ff88;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+    .btn-entrer {
+      padding: 14px 40px;
+      background: transparent;
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      font-family: monospace;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      letter-spacing: 2px;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-entrer:hover {
+      background: #00ff8822;
+      box-shadow: 0 0 20px #00ff8844;
+    }
+    .auteur {
+      position: absolute;
+      bottom: 20px;
+      color: #333;
+      font-size: 12px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #555;
+      margin: 4px;
+    }
+    .tags {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
+  <div class="contenu">
+    <h1>CyberMap 3D</h1>
+    <div class="sous-titre">Visualisateur interactif de cyberattaques reseau</div>
+
+    <div class="tags">
+      <span class="tag">Python</span>
+      <span class="tag">Three.js</span>
+      <span class="tag">SolidWorks</span>
+      <span class="tag">Cybersecurite</span>
+      <span class="tag">nmap</span>
+      <span class="tag">AES</span>
+    </div>
+
+    <div class="description">
+      CyberMap 3D est un projet personnel combinant <span>cybersecurite</span>,
+      <span>programmation</span> et <span>modelisation 3D</span>.<br><br>
+      Il scanne un reseau reel, detecte les machines connectees, analyse leurs
+      vulnerabilites CVE, et visualise en temps reel la propagation d'une
+      cyberattaque sur une carte 3D interactive.
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-nombre">12+</div>
+        <div class="stat-label">Outils cyber</div>
+      </div>
+      <div class="stat">
+        <div class="stat-nombre">500+</div>
+        <div class="stat-label">Lignes de code</div>
+      </div>
+      <div class="stat">
+        <div class="stat-nombre">3D</div>
+        <div class="stat-label">Modeles SolidWorks</div>
+      </div>
+    </div>
+
+    <a href="index.html" class="btn-entrer">ENTRER DANS LA CARTE</a>
+  </div>
+
+  <div class="auteur">Projet personnel — Hugo B. — Premiere MP3D — 2026</div>
+
+  <script>
+    // Fond etoile anime
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const etoiles = Array.from({length: 150}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5,
+      v: Math.random() * 0.3 + 0.1
+    }));
+
+    function animer() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0a0a1a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      etoiles.forEach(e => {
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fill();
+        e.y += e.v;
+        if (e.y > canvas.height) {
+          e.y = 0;
+          e.x = Math.random() * canvas.width;
+        }
+      });
+
+      requestAnimationFrame(animer);
+    }
+    animer();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
