@@ -82,7 +82,7 @@
       lumiere2.position.set(-10, -5, -10);
       scene.add(lumiere2);
 
-      const reponse = await fetch("../data/reseau.json");
+      const reponse = await fetch("reseau.json");
       const données = await reponse.json();
 
       function calculerPositions(nb) {

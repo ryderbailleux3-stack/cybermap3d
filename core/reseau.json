@@ -1,0 +1,139 @@
+[
+    {
+        "id": 1,
+        "nom": "livebox.home",
+        "ip": "192.168.1.1",
+        "type": "pc",
+        "os": "Linux 4.19 - 5.15",
+        "ports": [
+            {
+                "port": 53,
+                "service": "domain",
+                "version": "2.89"
+            },
+            {
+                "port": 80,
+                "service": "http",
+                "version": ""
+            },
+            {
+                "port": 443,
+                "service": "https",
+                "version": ""
+            }
+        ],
+        "infecte": false,
+        "vulnerabilites": []
+    },
+    {
+        "id": 2,
+        "nom": "device-4.home",
+        "ip": "192.168.1.10",
+        "type": "pc",
+        "os": "Google Fuchsia",
+        "ports": [],
+        "infecte": false
+    },
+    {
+        "id": 3,
+        "nom": "samsung.home",
+        "ip": "192.168.1.11",
+        "type": "pc",
+        "os": "Linux 3.2 - 4.14",
+        "ports": [
+            {
+                "port": 8080,
+                "service": "http",
+                "version": ""
+            }
+        ],
+        "infecte": false,
+        "vulnerabilites": []
+    },
+    {
+        "id": 4,
+        "nom": "redmi-note-11-pro-5g.home",
+        "ip": "192.168.1.12",
+        "type": "pc",
+        "os": "Inconnu",
+        "ports": [],
+        "infecte": false
+    },
+    {
+        "id": 5,
+        "nom": "Machine-5",
+        "ip": "192.168.1.13",
+        "type": "pc",
+        "os": "Linux 4.15 - 5.19",
+        "ports": [
+            {
+                "port": 8080,
+                "service": "http-proxy",
+                "version": ""
+            }
+        ],
+        "infecte": false,
+        "vulnerabilites": []
+    },
+    {
+        "id": 6,
+        "nom": "pixel-8-hugo.home",
+        "ip": "192.168.1.14",
+        "type": "pc",
+        "os": "Inconnu",
+        "ports": [],
+        "infecte": false
+    },
+    {
+        "id": 7,
+        "nom": "hugo.home",
+        "ip": "192.168.1.15",
+        "type": "pc",
+        "os": "Microsoft Windows 11 24H2 - 25H2",
+        "ports": [
+            {
+                "port": 135,
+                "service": "msrpc",
+                "version": ""
+            },
+            {
+                "port": 139,
+                "service": "netbios-ssn",
+                "version": ""
+            },
+            {
+                "port": 445,
+                "service": "microsoft-ds",
+                "version": ""
+            }
+        ],
+        "infecte": false,
+        "vulnerabilites": []
+    },
+    {
+        "id": 8,
+        "nom": "hp911a7f.home",
+        "ip": "192.168.1.25",
+        "type": "pc",
+        "os": "Brother or HP printer (VxWorks)",
+        "ports": [
+            {
+                "port": 80,
+                "service": "http",
+                "version": ""
+            },
+            {
+                "port": 443,
+                "service": "http",
+                "version": ""
+            },
+            {
+                "port": 8080,
+                "service": "http",
+                "version": ""
+            }
+        ],
+        "infecte": false,
+        "vulnerabilites": []
+    }
+]
