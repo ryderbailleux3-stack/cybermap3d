@@ -5,14 +5,14 @@
   <title>CyberMap 3D</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #121249; overflow: hidden; font-family: monospace; }
+    body { background: #0a0a1a; overflow: hidden; font-family: monospace; }
     #ui { position: absolute; top: 20px; left: 20px; color: #00ff88; font-size: 14px; }
     #ui h1 { font-size: 18px; margin-bottom: 10px; }
     #btn-attaque {
       margin-top: 12px; padding: 8px 18px;
       background: transparent; border: 1px solid #ff4444;
       color: #ff4444; font-family: monospace; font-size: 13px;
-      cursor: pointer; border-radius: 4px;
+      cursor: pointer; border-radius: 4px; display: block;
     }
     #btn-parefeu {
       margin-top: 8px; padding: 8px 18px;
@@ -20,8 +20,15 @@
       color: #00ff88; font-family: monospace; font-size: 13px;
       cursor: pointer; border-radius: 4px; display: none;
     }
+    #btn-rapport {
+      margin-top: 8px; padding: 8px 18px;
+      background: transparent; border: 1px solid #89b4fa;
+      color: #89b4fa; font-family: monospace; font-size: 13px;
+      cursor: pointer; border-radius: 4px; display: block;
+    }
     #btn-attaque:hover { background: #ff444422; }
     #btn-parefeu:hover { background: #00ff8822; }
+    #btn-rapport:hover { background: #89b4fa22; }
     #legende { position: absolute; bottom: 20px; left: 20px; color: #888; font-size: 12px; line-height: 1.8; }
     #chargement { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #00ff88; font-size: 16px; }
     #fiche {
@@ -34,23 +41,29 @@
     #fiche .port { color: #fab387; }
     #fiche .os { color: #89b4fa; }
     #fiche .fermer { float: right; cursor: pointer; color: #888; font-size: 16px; margin-top: -4px; }
+    .label-machine {
+      position: absolute; color: #00ff88; font-family: monospace;
+      font-size: 11px; pointer-events: none; text-shadow: 0 0 8px #00ff88;
+      transform: translate(-50%, -50%);
+    }
   </style>
 </head>
 <body>
-  <div id="chargement">⏳ Chargement...</div>
+  <div id="chargement">Chargement...</div>
   <div id="ui" style="display:none">
-    <h1>🔐 CyberMap 3D</h1>
-    <div id="nb-machines">Réseau : 0 machines</div>
-    <div id="statut">Statut : ✓ Tout est sain</div>
-    <button id="btn-attaque" onclick="lancerAttaque()">⚠ Lancer l'attaque</button>
-    <button id="btn-parefeu" onclick="activerParefeu()">🛡 Activer le pare-feu</button>
+    <h1>CyberMap 3D</h1>
+    <div id="nb-machines">Reseau : 0 machines</div>
+    <div id="statut">Statut : Tout est sain</div>
+    <button id="btn-attaque" onclick="lancerAttaque()">Lancer l'attaque</button>
+    <button id="btn-parefeu" onclick="activerParefeu()">Activer le pare-feu</button>
+    <button id="btn-rapport" onclick="genererRapport()">Generer rapport</button>
   </div>
   <div id="legende" style="display:none">
-    ■ Vert = Sain &nbsp;&nbsp; ■ Rouge = Infecté &nbsp;&nbsp; ■ Orange = Stoppé<br>
-    💡 Clique sur une machine pour voir ses infos
+    Vert = Sain &nbsp;&nbsp; Rouge = Infecte &nbsp;&nbsp; Orange = Stoppe<br>
+    Clique sur une machine pour voir ses infos
   </div>
   <div id="fiche">
-    <span class="fermer" onclick="document.getElementById('fiche').style.display='none'">✕</span>
+    <span class="fermer" onclick="document.getElementById('fiche').style.display='none'">X</span>
     <h2 id="fiche-nom">Machine</h2>
     <div id="fiche-ip"></div>
     <div id="fiche-os" class="os"></div>
@@ -64,6 +77,7 @@
   <script>
     const meshes = [];
     const objets3D = [];
+    const labels = [];
     let attaqueInterval = null;
     let attaqueEnCours = false;
 
@@ -83,25 +97,25 @@
       scene.add(lumiere2);
 
       const reponse = await fetch("reseau.json");
-      const données = await reponse.json();
+      const donnees = await reponse.json();
 
       function calculerPositions(nb) {
         const positions = [];
         for (let i = 0; i < nb; i++) {
-          const angle = (i / nb) * Math.PI * 2;
-          positions.push([Math.cos(angle) * 5, 0, Math.sin(angle) * 5]);
+          const angle = (i / nb) * Math.PI*2;
+          positions.push([Math.cos(angle) *5 , 0, Math.sin(angle) * 5]);
         }
         return positions;
       }
 
-      const positions = calculerPositions(données.length);
-      const machines = données.map((m, i) => ({
+      const positions = calculerPositions(donnees.length);
+      const machines = donnees.map((m, i) => ({
         nom: m.nom, type: m.type, infecte: m.infecte,
         ip: m.ip, os: m.os || "Inconnu", ports: m.ports || [],
         pos: positions[i]
       }));
 
-      document.getElementById("nb-machines").innerText = `Réseau : ${machines.length} machines`;
+      document.getElementById("nb-machines").innerText = "Reseau : " + machines.length + " machines";
 
       const dracoLoader = new THREE.DRACOLoader();
       dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
@@ -130,12 +144,18 @@
         const type = modeles[m.type] ? m.type : "pc";
         const modele = modeles[type].clone();
         modele.scale.set(20, 20, 20);
-        modele.rotation.x = -Math.PI*4;
+        modele.rotation.x = -Math.PI * 4;
         modele.position.set(...m.pos);
         teindreMesh(modele, 0x00ff88);
         scene.add(modele);
         meshes.push({ modele, machine: m });
         objets3D.push({ objet: modele, index: idx });
+
+        const label = document.createElement("div");
+        label.className = "label-machine";
+        label.innerText = m.nom.split(".")[0];
+        document.body.appendChild(label);
+        labels.push({ element: label, position: new THREE.Vector3(...m.pos) });
 
         machines.forEach(cible => {
           if (m !== cible) {
@@ -174,25 +194,37 @@
       });
 
       function afficherFiche(m) {
-        document.getElementById("fiche-nom").innerText = "🖥 " + m.nom;
+        document.getElementById("fiche-nom").innerText = m.nom;
         document.getElementById("fiche-ip").innerText = "IP : " + m.ip;
         document.getElementById("fiche-os").innerText = "OS : " + m.os;
         let portsHTML = "";
         if (m.ports && m.ports.length > 0) {
           portsHTML = "<br><strong>Ports ouverts :</strong><br>";
           m.ports.forEach(p => {
-            portsHTML += `<span class="port">🔓 ${p.port} — ${p.service} ${p.version}</span><br>`;
+            portsHTML += '<span class="port">Port ' + p.port + ' - ' + p.service + ' ' + p.version + '</span><br>';
           });
         } else {
-          portsHTML = "<br>🔒 Aucun port ouvert";
+          portsHTML = "<br>Aucun port ouvert";
         }
         document.getElementById("fiche-ports").innerHTML = portsHTML;
         document.getElementById("fiche").style.display = "block";
       }
 
+      function mettreAJourLabels() {
+        labels.forEach(({ element, position }) => {
+          const pos = position.clone().applyMatrix4(scene.matrixWorld);
+          const projected = pos.project(camera);
+          const x = (projected.x * 0.5 + 0.5) * window.innerWidth;
+          const y = (-projected.y * 0.5 + 0.5) * window.innerHeight - 40;
+          element.style.left = x + "px";
+          element.style.top = y + "px";
+        });
+      }
+
       function animer() {
         requestAnimationFrame(animer);
         scene.rotation.y += 0.004;
+        mettreAJourLabels();
         renderer.render(scene, camera);
       }
       animer();
@@ -207,14 +239,14 @@
     function lancerAttaque() {
       document.getElementById("btn-attaque").disabled = true;
       document.getElementById("btn-parefeu").style.display = "block";
-      document.getElementById("statut").innerText = "Statut : 🔴 Attaque en cours...";
+      document.getElementById("statut").innerText = "Statut : Attaque en cours...";
       attaqueEnCours = true;
       let i = 0;
       attaqueInterval = setInterval(() => {
         if (i >= meshes.length) {
           clearInterval(attaqueInterval);
           attaqueEnCours = false;
-          document.getElementById("statut").innerText = "Statut : ☣ Réseau compromis !";
+          document.getElementById("statut").innerText = "Statut : Reseau compromis !";
           return;
         }
         meshes[i].modele.traverse(child => {
@@ -228,7 +260,7 @@
       clearInterval(attaqueInterval);
       attaqueEnCours = false;
       document.getElementById("btn-parefeu").disabled = true;
-      document.getElementById("statut").innerText = "Statut : 🛡 Pare-feu activé !";
+      document.getElementById("statut").innerText = "Statut : Pare-feu active !";
       meshes.forEach(m => {
         m.modele.traverse(child => {
           if (child.isMesh) {
@@ -241,6 +273,10 @@
           }
         });
       });
+    }
+
+    function genererRapport() {
+      alert("Lance : python core/rapport.py dans le terminal pour generer le PDF !");
     }
 
     init();
