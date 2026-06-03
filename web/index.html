@@ -292,10 +292,19 @@ function animer() {
       });
     }
 
-    function genererRapport() {
-      alert("Lance : python core/rapport.py dans le terminal pour generer le PDF !");
-    }
-
+   function genererRapport() {
+  document.getElementById("btn-rapport").innerText = "Generation en cours...";
+  fetch("http://localhost:8001/generer-rapport")
+    .then(r => r.json())
+    .then(data => {
+      if (data.succes) {
+        alert("Rapport PDF genere dans le dossier rapports !");
+      } else {
+        alert("Erreur : " + data.message);
+      }
+      document.getElementById("btn-rapport").innerText = "Generer rapport";
+    });
+}
     init();
   </script>
 </body>
