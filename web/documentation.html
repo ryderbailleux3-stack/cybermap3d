@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberMap 3D - Documentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a1a; color: #cdd6f4; font-family: monospace; }
+    
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #0d1117; border-bottom: 1px solid #00ff8822;
+      padding: 14px 30px; display: flex; align-items: center;
+      gap: 20px; z-index: 100;
+    }
+    nav h1 { color: #00ff88; font-size: 16px; }
+    nav a {
+      color: #888; font-size: 13px; text-decoration: none;
+      padding: 4px 12px; border-radius: 4px;
+    }
+    nav a:hover { color: #00ff88; background: #00ff8811; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 100px 30px 60px; }
+
+    h2 { color: #00ff88; font-size: 22px; margin-bottom: 6px; }
+    .intro { color: #888; font-size: 14px; margin-bottom: 50px; line-height: 1.8; }
+
+    .section { margin-bottom: 60px; }
+    .section-titre {
+      font-size: 18px; color: #89b4fa;
+      margin-bottom: 20px; padding-bottom: 8px;
+      border-bottom: 1px solid #89b4fa22;
+    }
+
+    .outil {
+      background: #0d1117; border: 1px solid #1a1a2e;
+      border-radius: 8px; padding: 20px; margin-bottom: 16px;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .outil:hover { border-color: #00ff8844; }
+    .outil.actif { border-color: #00ff88; }
+
+    .outil-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .outil-nom { font-size: 15px; color: #00ff88; font-weight: bold; }
+    .outil-tag {
+      font-size: 11px; padding: 2px 8px;
+      border-radius: 4px; background: #1a1a2e; color: #888;
+    }
+    .outil-desc {
+      font-size: 13px; color: #888;
+      margin-top: 4px;
+    }
+    .outil-detail {
+      display: none; margin-top: 16px;
+      padding-top: 16px; border-top: 1px solid #1a1a2e;
+    }
+    .outil.actif .outil-detail { display: block; }
+
+    .outil-detail p {
+      font-size: 13px; color: #cdd6f4;
+      line-height: 1.8; margin-bottom: 12px;
+    }
+    .outil-detail code {
+      display: block; background: #1e1e2e;
+      padding: 12px 16px; border-radius: 6px;
+      font-size: 12px; color: #a6e3a1;
+      line-height: 1.8; margin-bottom: 12px;
+      overflow-x: auto;
+    }
+    .tag-cyber { background: #FAECE7; color: #712B13; }
+    .tag-python { background: #E1F5EE; color: #085041; }
+    .tag-web { background: #EEEDFE; color: #3C3489; }
+    .tag-3d { background: #FAEEDA; color: #633806; }
+
+    .fleche { color: #888; transition: transform 0.2s; }
+    .outil.actif .fleche { transform: rotate(90deg); }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1>CyberMap 3D</h1>
+    <a href="accueil.html">Accueil</a>
+    <a href="index.html">Visualisation</a>
+    <a href="documentation.html" style="color:#00ff88">Documentation</a>
+  </nav>
+
+  <div class="container">
+    <h2>Documentation</h2>
+    <p class="intro">
+      CyberMap 3D est compose de plusieurs outils Python et d'une
+      interface web 3D. Chaque outil joue un role dans la chaine
+      de securite — du scan reseau jusqu'a la visualisation.
+      Clique sur un outil pour voir les details.
+    </p>
+
+    <!-- SECTION SCAN -->
+    <div class="section">
+      <div class="section-titre">Scan & Reconnaissance</div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">scanner.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Scan reseau simple par ping</div>
+          </div>
+          <span class="outil-tag tag-python">Python</span>
+        </div>
+        <div class="outil-detail">
+          <p>Utilise <strong>nmap</strong> en mode ping (-sn) pour detecter toutes les machines connectees sur le reseau local. Rapide et discret, il ne scanne pas les ports.</p>
+          <code>scanner.scan(hosts="192.168.0.0/24", arguments="-sn")</code>
+          <p>Resultat : liste des IPs actives sauvegardee dans <strong>data/reseau.json</strong></p>
+        </div>
+      </div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">scanner_ports.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Scan avance — ports, services, OS</div>
+          </div>
+          <span class="outil-tag tag-python">Python</span>
+        </div>
+        <div class="outil-detail">
+          <p>Scan approfondi avec detection des ports ouverts (-sV), identification de l'OS (-O) et des versions des services. Plus lent mais beaucoup plus informatif.</p>
+          <code>scanner.scan(hosts=ip, arguments="-sV -O --top-ports 20")</code>
+          <p>Detecte par exemple : <strong>Windows 11</strong>, ports 135/139/445 ouverts sur ton PC.</p>
+        </div>
+      </div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">osint.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Collecte d'informations publiques</div>
+          </div>
+          <span class="outil-tag tag-python">Python</span>
+        </div>
+        <div class="outil-detail">
+          <p>OSINT (Open Source Intelligence) — collecte des informations publiques sur une cible sans l'attaquer. Geolocalisaton IP, headers HTTP, technologies utilisees.</p>
+          <code>requests.get("http://ip-api.com/json/" + ip)</code>
+          <p>Exemple : google.com → IP 172.217.22.46 → Frankfurt, Allemagne, Google LLC</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION DETECTION -->
+    <div class="section">
+      <div class="section-titre">Detection & Alertes</div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">vulnerabilites.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Analyse des failles CVE</div>
+          </div>
+          <span class="outil-tag tag-cyber">Cybersecurite</span>
+        </div>
+        <div class="outil-detail">
+          <p>Interroge la base de donnees CVE du NIST (gouvernement americain) pour trouver les failles connues sur les services detectes. Chaque faille a un score de 0 a 10.</p>
+          <code>requests.get("https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=" + service)</code>
+          <p>Score CRITICAL (9-10) = faille tres dangereuse. Le port 445 ouvert sur ton PC correspond a la faille WannaCry (CVE-2017-0144, score 9.3).</p>
+        </div>
+      </div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">detecteur.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Systeme de detection d'intrusion (IDS)</div>
+          </div>
+          <span class="outil-tag tag-cyber">Cybersecurite</span>
+        </div>
+        <div class="outil-detail">
+          <p>Compare le reseau actuel avec une liste blanche de machines connues. Si une nouvelle machine apparait, une alerte est generee et sauvegardee dans alertes.json.</p>
+          <code>if ip not in machines_connues:
+    alertes.append({"type": "INTRUS", "ip": ip})</code>
+          <p>C'est le principe d'un vrai IDS comme Snort ou Suricata utilise en entreprise.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION ATTAQUES -->
+    <div class="section">
+      <div class="section-titre">Simulations d'attaques</div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">honeypot.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Faux serveur piege</div>
+          </div>
+          <span class="outil-tag tag-cyber">Cybersecurite</span>
+        </div>
+        <div class="outil-detail">
+          <p>Simule 3 faux serveurs (SSH port 2222, HTTP port 8080, FTP port 2121) pour attirer et enregistrer les tentatives d'intrusion. Utilise le threading pour ecouter les 3 ports simultanement.</p>
+          <code>t1 = threading.Thread(target=honeypot_ssh, daemon=True)
+t2 = threading.Thread(target=honeypot_http, daemon=True)
+t3 = threading.Thread(target=honeypot_ftp, daemon=True)</code>
+        </div>
+      </div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">craqueur.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Craquage de hash MD5/SHA</div>
+          </div>
+          <span class="outil-tag tag-cyber">Cybersecurite</span>
+        </div>
+        <div class="outil-detail">
+          <p>Attaque par dictionnaire — teste une liste de mots de passe courants et compare leur hash avec la cible. Demontre pourquoi "admin" se craque en moins d'1 seconde.</p>
+          <code>hash_essai = hashlib.md5(mot.encode()).hexdigest()
+if hash_essai == hash_cible:
+    print("Trouve :", mot)</code>
+        </div>
+      </div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">chiffrement.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Chiffrement AES-256</div>
+          </div>
+          <span class="outil-tag tag-cyber">Cybersecurite</span>
+        </div>
+        <div class="outil-detail">
+          <p>Implementation du chiffrement AES-256 en mode CBC. Chiffre et dechiffre des messages avec une cle secrete. Sans la cle, le message est impossible a lire.</p>
+          <code>cipher = AES.new(cle, AES.MODE_CBC, iv)
+message_chiffre = cipher.encrypt(pad(message, AES.block_size))</code>
+          <p>HTTPS, WhatsApp et Signal utilisent AES pour proteger toutes vos communications.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION VISUALISATION -->
+    <div class="section">
+      <div class="section-titre">Visualisation 3D</div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">index.html <span class="fleche">▶</span></div>
+            <div class="outil-desc">Interface 3D interactive</div>
+          </div>
+          <span class="outil-tag tag-web">Three.js</span>
+        </div>
+        <div class="outil-detail">
+          <p>Visualisation 3D du reseau avec Three.js. Charge les modeles SolidWorks (.glb), place les machines en cercle, anime les connexions et simule la propagation d'une attaque.</p>
+          <code>const loader = new THREE.GLTFLoader();
+loader.load("pc.glb", (gltf) => scene.add(gltf.scene));</code>
+          <p>Fonctionnalites : rotation automatique, clic sur machine, pare-feu, radar, log d'evenements, particules de trafic.</p>
+        </div>
+      </div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">Modeles SolidWorks <span class="fleche">▶</span></div>
+            <div class="outil-desc">PC, Serveur, Routeur en 3D</div>
+          </div>
+          <span class="outil-tag tag-3d">SolidWorks</span>
+        </div>
+        <div class="outil-detail">
+          <p>3 modeles 3D crees dans SolidWorks et exportes en format .glb (compatible Three.js). Le format glTF est le standard web pour les modeles 3D — compact et rapide a charger.</p>
+          <p>Fichiers : <strong>pc.glb</strong> (62kb), <strong>routeur.glb</strong> (13kb), <strong>serveur.glb</strong> (9kb)</p>
+        </div>
+      </div>
+
+      <div class="outil" onclick="toggle(this)">
+        <div class="outil-header">
+          <div>
+            <div class="outil-nom">rapport.py <span class="fleche">▶</span></div>
+            <div class="outil-desc">Generateur de rapport PDF</div>
+          </div>
+          <span class="outil-tag tag-python">Python</span>
+        </div>
+        <div class="outil-detail">
+          <p>Genere automatiquement un rapport PDF professionnel avec ReportLab. Resume les machines detectees, ports ouverts, vulnerabilites et recommandations de securite.</p>
+          <code>doc = SimpleDocTemplate("rapport.pdf", pagesize=A4)
+doc.build(contenu)</code>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function toggle(el) {
+      el.classList.toggle("actif");
+    }
+  </script>
+</body>
+</html>
