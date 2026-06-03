@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberMap 3D</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a1a; overflow: hidden; font-family: monospace; }
+    #ui { position: absolute; top: 20px; left: 20px; color: #00ff88; font-size: 14px; }
+    #ui h1 { font-size: 18px; margin-bottom: 10px; }
+    #btn-attaque {
+      margin-top: 12px; padding: 8px 18px;
+      background: transparent; border: 1px solid #ff4444;
+      color: #ff4444; font-family: monospace; font-size: 13px;
+      cursor: pointer; border-radius: 4px; display: block;
+    }
+    #btn-parefeu {
+      margin-top: 8px; padding: 8px 18px;
+      background: transparent; border: 1px solid #00ff88;
+      color: #00ff88; font-family: monospace; font-size: 13px;
+      cursor: pointer; border-radius: 4px; display: none;
+    }
+    #btn-reset {
+      margin-top: 8px; padding: 8px 18px;
+      background: transparent; border: 1px solid #888;
+      color: #888; font-family: monospace; font-size: 13px;
+      cursor: pointer; border-radius: 4px; display: block;
+    }
+    #btn-rapport {
+      margin-top: 8px; padding: 8px 18px;
+      background: transparent; border: 1px solid #89b4fa;
+      color: #89b4fa; font-family: monospace; font-size: 13px;
+      cursor: pointer; border-radius: 4px; display: block;
+    }
+    #btn-attaque:hover { background: #ff444422; }
+    #btn-parefeu:hover { background: #00ff8822; }
+    #btn-reset:hover { background: #88888822; }
+    #btn-rapport:hover { background: #89b4fa22; }
+    #legende { position: absolute; bottom: 20px; left: 20px; color: #888; font-size: 12px; line-height: 1.8; }
+    #chargement { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #00ff88; font-size: 16px; }
+    #fiche {
+      position: absolute; top: 20px; right: 20px;
+      background: #0d1117; border: 1px solid #00ff8844;
+      border-radius: 8px; padding: 16px; width: 260px;
+      color: #cdd6f4; font-size: 13px; line-height: 1.8; display: none;
+    }
+    #fiche h2 { color: #00ff88; font-size: 14px; margin-bottom: 8px; }
+    #fiche .port { color: #fab387; }
+    #fiche .os { color: #89b4fa; }
+    #fiche .fermer { float: right; cursor: pointer; color: #888; font-size: 16px; margin-top: -4px; }
+    .label-machine {
+      position: absolute; color: #00ff88; font-family: monospace;
+      font-size: 11px; pointer-events: none; text-shadow: 0 0 8px #00ff88;
+      transform: translate(-50%, -50%);
+    }
+    #log {
+      position: absolute; bottom: 60px; left: 20px;
+      color: #555; font-size: 11px; line-height: 1.6;
+      max-width: 350px;
+    }
+    #log .log-entry { color: #00ff88; }
+    #log .log-rouge { color: #ff4444; }
+    #log .log-orange { color: #ff8800; }
+  </style>
+</head>
+<body>
+  <div id="chargement">Chargement...</div>
+  <div id="ui" style="display:none">
+    <h1>CyberMap 3D</h1>
+    <div id="nb-machines">Reseau : 0 machines</div>
+    <div id="statut">Statut : Tout est sain</div>
+    <div id="compteur" style="color:#fab387; margin-top:4px;">Infectees : 0 / 0</div>
+    <button id="btn-attaque" onclick="lancerAttaque()">Lancer l'attaque</button>
+    <button id="btn-parefeu" onclick="activerParefeu()">Activer le pare-feu</button>
+    <button id="btn-reset" onclick="reinitialiser()">Reinitialiser</button>
+    <button id="btn-rapport" onclick="genererRapport()">Generer rapport</button>
+  </div>
+  <div id="legende" style="display:none">
+    Vert = Sain &nbsp;&nbsp; Rouge = Infecte &nbsp;&nbsp; Orange = Stoppe<br>
+    Clique sur une machine pour voir ses infos
+  </div>
+  <div id="fiche">
+    <span class="fermer" onclick="document.getElementById('fiche').style.display='none'">X</span>
+    <h2 id="fiche-nom">Machine</h2>
+    <div id="fiche-ip"></div>
+    <div id="fiche-os" class="os"></div>
+    <div id="fiche-ports"></div>
+  </div>
+  <div id="log"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+
+  <script>
+    const meshes = [];
+    const objets3D = [];
+    const labels = [];
+    const particulesAnimees = [];
+    let attaqueInterval = null;
+    let attaqueEnCours = false;
+    let temps = 0;
+
+    function ajouterLog(message, type) {
+      const log = document.getElementById("log");
+      const entry = document.createElement("div");
+      const heure = new Date().toLocaleTimeString();
+      entry.className = "log-entry" + (type === "rouge" ? " log-rouge" : type === "orange" ? " log-orange" : "");
+      entry.innerText = "[" + heure + "] " + message;
+      log.appendChild(entry);
+      if (log.children.length > 8) log.removeChild(log.children[0]);
+    }
+
+    async function init() {
+      const scene = new THREE.Scene();
+
+      // Fond etoile
+      const etoilesGeo = new THREE.BufferGeometry();
+      const etoilesPos = [];
+      for (let i = 0; i < 2000; i++) {
+        etoilesPos.push(
+          (Math.random() - 0.5) * 200,
+          (Math.random() - 0.5) * 200,
+          (Math.random() - 0.5) * 200
+        );
+      }
+      etoilesGeo.setAttribute("position", new THREE.Float32BufferAttribute(etoilesPos, 3));
+      const etoilesMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+      const etoiles = new THREE.Points(etoilesGeo, etoilesMat);
+      scene.add(etoiles);
+
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      scene.add(new THREE.AmbientLight(0x666666));
+      const lumiere = new THREE.PointLight(0xffffff, 2, 100);
+      lumiere.position.set(10, 10, 10);
+      scene.add(lumiere);
+      const lumiere2 = new THREE.PointLight(0x4444ff, 1, 100);
+      lumiere2.position.set(-10, -5, -10);
+      scene.add(lumiere2);
+
+      const reponse = await fetch("reseau.json");
+      const donnees = await reponse.json();
+
+      function calculerPositions(nb) {
+        const positions = [];
+        for (let i = 0; i < nb; i++) {
+          const angle = (i / nb) * Math.PI * 2;
+          positions.push([Math.cos(angle) * 5, 0, Math.sin(angle) * 5]);
+        }
+        return positions;
+      }
+
+      const positions = calculerPositions(donnees.length);
+      const machines = donnees.map((m, i) => ({
+        nom: m.nom, type: m.type, infecte: m.infecte,
+        ip: m.ip, os: m.os || "Inconnu", ports: m.ports || [],
+        pos: positions[i]
+      }));
+
+      document.getElementById("nb-machines").innerText = "Reseau : " + machines.length + " machines";
+      document.getElementById("compteur").innerText = "Infectees : 0 / " + machines.length;
+
+      const dracoLoader = new THREE.DRACOLoader();
+      dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
+      const loader = new THREE.GLTFLoader();
+      loader.setDRACOLoader(dracoLoader);
+
+      function chargerModele(fichier) {
+        return new Promise((resolve) => {
+          loader.load(fichier, (gltf) => resolve(gltf.scene));
+        });
+      }
+
+      const modeles = {
+        pc:      await chargerModele("pc.glb"),
+        serveur: await chargerModele("serveur.glb"),
+        routeur: await chargerModele("routeur.glb"),
+      };
+
+      function teindreMesh(obj, couleur) {
+        obj.traverse(child => {
+          if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: couleur });
+        });
+      }
+
+      machines.forEach((m, idx) => {
+        const type = modeles[m.type] ? m.type : "pc";
+        const modele = modeles[type].clone();
+        modele.scale.set(20, 20, 20);
+        if (m.type === "pc") {
+          modele.rotation.x = -Math.PI * 4;
+          modele.rotation.z = Math.PI / 2;
+        } else {
+          modele.rotation.x = -Math.PI / 2;
+        }
+        modele.position.set(...m.pos);
+        teindreMesh(modele, 0x00ff88);
+        scene.add(modele);
+        meshes.push({ modele, machine: m });
+        objets3D.push({ objet: modele, index: idx });
+
+        const label = document.createElement("div");
+        label.className = "label-machine";
+        label.innerText = m.nom.split(".")[0];
+        document.body.appendChild(label);
+        labels.push({ element: label, position: new THREE.Vector3(...m.pos) });
+
+        machines.forEach(cible => {
+          if (m !== cible) {
+            const pts = [new THREE.Vector3(...m.pos), new THREE.Vector3(...cible.pos)];
+            const geo_l = new THREE.BufferGeometry().setFromPoints(pts);
+            scene.add(new THREE.Line(geo_l, new THREE.LineBasicMaterial({ color: 0x223355 })));
+          }
+        });
+      });
+
+      // Particules de trafic
+      machines.forEach(m => {
+        machines.forEach(cible => {
+          if (m !== cible) {
+            const geoP = new THREE.SphereGeometry(0.05, 4, 4);
+            const matP = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
+            const particle = new THREE.Mesh(geoP, matP);
+            scene.add(particle);
+            particulesAnimees.push({
+              mesh: particle,
+              debut: new THREE.Vector3(...m.pos),
+              fin: new THREE.Vector3(...cible.pos),
+              t: Math.random()
+            });
+          }
+        });
+      });
+
+      document.getElementById("chargement").style.display = "none";
+      document.getElementById("ui").style.display = "block";
+      document.getElementById("legende").style.display = "block";
+      ajouterLog("Systeme CyberMap 3D demarre", "");
+
+      camera.position.set(0, 12, 8);
+      camera.lookAt(0, 0, 0);
+
+      const raycaster = new THREE.Raycaster();
+      const souris = new THREE.Vector2();
+
+      renderer.domElement.addEventListener("click", (event) => {
+        souris.x = (event.clientX / window.innerWidth) * 2 - 1;
+        souris.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(souris, camera);
+        const cibles = [];
+        objets3D.forEach(({ objet, index }) => {
+          objet.traverse(child => {
+            if (child.isMesh) cibles.push({ mesh: child, index });
+          });
+        });
+        const intersections = raycaster.intersectObjects(cibles.map(c => c.mesh));
+        if (intersections.length > 0) {
+          const clique = cibles.find(c => c.mesh === intersections[0].object);
+          if (clique !== undefined) afficherFiche(machines[clique.index]);
+        }
+      });
+
+      function afficherFiche(m) {
+        document.getElementById("fiche-nom").innerText = m.nom;
+        document.getElementById("fiche-ip").innerText = "IP : " + m.ip;
+        document.getElementById("fiche-os").innerText = "OS : " + m.os;
+        let portsHTML = "";
+        if (m.ports && m.ports.length > 0) {
+          portsHTML = "<br><strong>Ports ouverts :</strong><br>";
+          m.ports.forEach(p => {
+            portsHTML += '<span class="port">Port ' + p.port + ' - ' + p.service + '</span><br>';
+          });
+        } else {
+          portsHTML = "<br>Aucun port ouvert";
+        }
+        document.getElementById("fiche-ports").innerHTML = portsHTML;
+        document.getElementById("fiche").style.display = "block";
+        ajouterLog("Inspection : " + m.nom.split(".")[0], "");
+      }
+
+      function mettreAJourLabels() {
+        labels.forEach(({ element, position }) => {
+          const pos = position.clone().applyMatrix4(scene.matrixWorld);
+          const projected = pos.project(camera);
+          const x = (projected.x * 0.5 + 0.5) * window.innerWidth;
+          const y = (-projected.y * 0.5 + 0.5) * window.innerHeight - 40;
+          element.style.left = x + "px";
+          element.style.top = y + "px";
+        });
+      }
+
+      function animer() {
+        requestAnimationFrame(animer);
+        temps += 0.05;
+        scene.rotation.y += 0.004;
+
+        // Pulsation machines infectees
+        meshes.forEach(m => {
+          m.modele.traverse(child => {
+            if (child.isMesh && child.material.color.getHex() === 0xff2222) {
+              const scale = 20 + Math.sin(temps * 3) * 2;
+              m.modele.scale.set(scale, scale, scale);
+            }
+          });
+        });
+
+        // Animer particules
+        particulesAnimees.forEach(p => {
+          p.t += 0.005;
+          if (p.t > 1) p.t = 0;
+          p.mesh.position.lerpVectors(p.debut, p.fin, p.t);
+        });
+
+        mettreAJourLabels();
+        renderer.render(scene, camera);
+      }
+      animer();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    function lancerAttaque() {
+      document.getElementById("btn-attaque").disabled = true;
+      document.getElementById("btn-parefeu").style.display = "block";
+      document.getElementById("statut").innerText = "Statut : Attaque en cours...";
+      ajouterLog("Attaque lancee sur le reseau !", "rouge");
+      attaqueEnCours = true;
+      let i = 0;
+      let infectees = 0;
+      attaqueInterval = setInterval(() => {
+        if (i >= meshes.length) {
+          clearInterval(attaqueInterval);
+          attaqueEnCours = false;
+          document.getElementById("statut").innerText = "Statut : Reseau compromis !";
+          ajouterLog("Reseau entierement compromis !", "rouge");
+          return;
+        }
+        meshes[i].modele.traverse(child => {
+          if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: 0xff2222 });
+        });
+        infectees++;
+        document.getElementById("compteur").innerText = "Infectees : " + infectees + " / " + meshes.length;
+        ajouterLog("Machine infectee : " + meshes[i].machine.nom.split(".")[0], "rouge");
+        i++;
+      }, 1000);
+    }
+
+    function activerParefeu() {
+      clearInterval(attaqueInterval);
+      attaqueEnCours = false;
+      document.getElementById("btn-parefeu").disabled = true;
+      document.getElementById("statut").innerText = "Statut : Pare-feu active !";
+      ajouterLog("Pare-feu active — propagation stoppee !", "orange");
+      meshes.forEach(m => {
+        m.modele.traverse(child => {
+          if (child.isMesh) {
+            const hex = child.material.color.getHex();
+            if (hex === 0xff2222) {
+              child.material = new THREE.MeshPhongMaterial({ color: 0xff8800 });
+            } else {
+              child.material = new THREE.MeshPhongMaterial({ color: 0x00ff88 });
+            }
+          }
+        });
+      });
+    }
+
+    function reinitialiser() {
+      clearInterval(attaqueInterval);
+      attaqueEnCours = false;
+      document.getElementById("btn-attaque").disabled = false;
+      document.getElementById("btn-parefeu").style.display = "none";
+      document.getElementById("btn-parefeu").disabled = false;
+      document.getElementById("statut").innerText = "Statut : Tout est sain";
+      document.getElementById("compteur").innerText = "Infectees : 0 / " + meshes.length;
+      document.getElementById("log").innerHTML = "";
+      ajouterLog("Systeme reinitialise", "");
+      meshes.forEach(m => {
+        m.modele.traverse(child => {
+          if (child.isMesh) child.material = new THREE.MeshPhongMaterial({ color: 0x00ff88 });
+        });
+        m.modele.scale.set(20, 20, 20);
+      });
+    }
+
+    function genererRapport() {
+      document.getElementById("btn-rapport").innerText = "Generation...";
+      ajouterLog("Generation du rapport PDF...", "");
+      fetch("http://localhost:8001/generer-rapport")
+        .then(r => r.json())
+        .then(data => {
+          if (data.succes) {
+            ajouterLog("Rapport PDF genere !", "");
+            alert("Rapport PDF genere dans le dossier rapports !");
+          } else {
+            ajouterLog("Erreur rapport : " + data.message, "rouge");
+          }
+          document.getElementById("btn-rapport").innerText = "Generer rapport";
+        })
+        .catch(() => {
+          ajouterLog("Serveur API non disponible", "rouge");
+          document.getElementById("btn-rapport").innerText = "Generer rapport";
+        });
+    }
+
+    init();
+  </script>
+</body>
+</html>
