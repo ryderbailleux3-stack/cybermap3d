@@ -1,0 +1,154 @@
+
+<style>
+.nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.nav-btn { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.nav-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.bloc { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.bloc-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.code-block { background: #1e1e2e; border-radius: var(--border-radius-md); padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.9; overflow-x: auto; }
+.c-kw { color: #cba6f7; }
+.c-str { color: #a6e3a1; }
+.c-num { color: #fab387; }
+.c-comment { color: #6c7086; font-style: italic; }
+.c-fn { color: #89b4fa; }
+.c-var { color: #cdd6f4; }
+.annotation { border-left: 2px solid var(--color-border-info); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.schema-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 13px; }
+.schema-box { padding: 6px 12px; border-radius: var(--border-radius-md); font-weight: 500; font-size: 12px; min-width: 120px; text-align: center; }
+.arrow { color: var(--color-text-tertiary); font-size: 18px; }
+.schema-desc { color: var(--color-text-secondary); font-size: 12px; }
+</style>
+
+<div style="padding: 1rem 0">
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('principe')">Le principe</button>
+    <button class="nav-btn" onclick="show('boucle')">Double boucle</button>
+    <button class="nav-btn" onclick="show('simulation')">Simulation</button>
+    <button class="nav-btn" onclick="show('protection')">Se protéger</button>
+    <button class="nav-btn" onclick="show('reel')">Lien réel</button>
+  </div>
+
+  <!-- PRINCIPE -->
+  <div class="section active" id="s-principe">
+    <div class="bloc">
+      <div class="bloc-title">C'est quoi le bruteforce SSH ?</div>
+      <div class="annotation" style="margin-top:0">
+        Le <strong>bruteforce</strong> (force brute) c'est essayer tous les mots de passe possibles jusqu'à trouver le bon. C'est l'attaque la plus simple et la plus courante contre SSH.<br><br>
+        SSH (Secure Shell) permet de se connecter à distance à un serveur Linux. Si un serveur SSH est exposé sur internet, des bots automatiques essaient des milliers de mots de passe par seconde en permanence.<br><br>
+        Notre simulation teste :<br>
+        → 4 utilisateurs × 20 mots de passe = <strong>80 tentatives</strong><br>
+        → Un vrai outil comme <strong>Hydra</strong> teste des millions de combinaisons
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-title">Bruteforce vs Dictionnaire</div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAECE7;color:#712B13">Bruteforce pur</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Teste toutes les combinaisons possibles (aaa, aab, aac...) — très lent</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#E1F5EE;color:#085041">Dictionnaire</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Teste une liste de mots courants — beaucoup plus efficace en pratique</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#EEEDFE;color:#3C3489">Hybride</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Dictionnaire + variations (hugo123, Hugo!, HUGO...) — le plus efficace</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUCLE -->
+  <div class="section" id="s-boucle">
+    <div class="bloc">
+      <div class="bloc-title">La double boucle — tester toutes les combinaisons</div>
+      <div class="code-block">
+        <div><span class="c-kw">for</span> <span class="c-var">utilisateur</span> <span class="c-kw">in</span> <span class="c-var">UTILISATEURS</span>:    <span class="c-comment"># root, admin, user, hugo</span></div>
+        <div>&nbsp;&nbsp;<span class="c-kw">for</span> <span class="c-var">mot_de_passe</span> <span class="c-kw">in</span> <span class="c-var">DICTIONNAIRE</span>:  <span class="c-comment"># 20 mots de passe</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">succes</span> = <span class="c-fn">simuler_tentative</span>(<span class="c-var">utilisateur</span>, <span class="c-var">mot_de_passe</span>)</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">if</span> <span class="c-var">succes</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">print</span>(<span class="c-str">"ACCES OBTENU !"</span>)</div>
+      </div>
+      <div class="annotation">
+        C'est une <strong>double boucle</strong> — on a déjà vu ça dans le scanner de ports ! Pour chaque utilisateur on essaie tous les mots de passe. Si on a 4 utilisateurs et 20 mots de passe → 4 × 20 = <strong>80 tentatives</strong>.<br><br>
+        Un vrai attaquant avec une liste de 10 000 utilisateurs et 1 million de mots de passe ferait <strong>10 milliards de tentatives</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULATION -->
+  <div class="section" id="s-simulation">
+    <div class="bloc">
+      <div class="bloc-title">Pourquoi on simule sans vraie connexion</div>
+      <div class="code-block">
+        <div><span class="c-kw">def</span> <span class="c-fn">simuler_tentative</span>(<span class="c-var">utilisateur</span>, <span class="c-var">mot_de_passe</span>):</div>
+        <div>&nbsp;&nbsp;<span class="c-var">time</span>.<span class="c-fn">sleep</span>(<span class="c-num">0.2</span>)  <span class="c-comment"># simule le délai réseau</span></div>
+        <div>&nbsp;&nbsp;<span class="c-kw">if</span> <span class="c-var">utilisateur</span> == <span class="c-str">"admin"</span> <span class="c-kw">and</span> <span class="c-var">mot_de_passe</span> == <span class="c-str">"admin"</span>:</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-kw">True</span>   <span class="c-comment"># succes simulé</span></div>
+        <div>&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-kw">False</span></div>
+      </div>
+      <div class="annotation">
+        On simule les tentatives au lieu de faire de vraies connexions SSH pour deux raisons :<br><br>
+        1. <strong>Légalité</strong> — faire de vraies tentatives de connexion sur un serveur sans autorisation est illégal, même sur localhost<br><br>
+        2. <strong>Pédagogie</strong> — comprendre la logique suffit. Le vrai code avec Paramiko (bibliothèque SSH Python) serait identique, juste avec une vraie connexion à la place de <code>sleep()</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROTECTION -->
+  <div class="section" id="s-protection">
+    <div class="bloc">
+      <div class="bloc-title">Comment se protéger du bruteforce</div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#E1F5EE;color:#085041">fail2ban</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Bloque automatiquement une IP après X tentatives échouées</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#EEEDFE;color:#3C3489">Clé SSH</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Remplace le mot de passe par une clé cryptographique — bruteforce impossible</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAEEDA;color:#633806">Port custom</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Changer SSH du port 22 au port 2222 réduit 90% des scans automatiques</div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-box" style="background:#FAECE7;color:#712B13">2FA</div>
+        <div class="arrow">→</div>
+        <div class="schema-desc">Double authentification — même avec le bon mot de passe, besoin d'un code</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REEL -->
+  <div class="section" id="s-reel">
+    <div class="bloc">
+      <div class="bloc-title">Lien avec la vraie cybersécurité</div>
+      <div class="annotation" style="margin-top:0">
+        Chaque serveur SSH exposé sur internet reçoit des milliers de tentatives de bruteforce par jour — c'est automatique, des bots scannent en permanence toute l'IPv4 mondiale.<br><br>
+        L'outil <strong>Hydra</strong> peut tester jusqu'à <strong>50 000 mots de passe par seconde</strong> en parallèle. Avec une liste de 10 millions de mots de passe courants, un serveur avec le mot de passe "admin" se fait compromettre en quelques secondes.<br><br>
+        C'est pour ça que les admins système utilisent toujours :<br>
+        → Des clés SSH au lieu de mots de passe<br>
+        → fail2ban pour bloquer les IPs suspectes<br>
+        → Un port SSH non standard<br><br>
+        En comprenant comment fonctionne le bruteforce, tu comprends pourquoi ces protections sont indispensables.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

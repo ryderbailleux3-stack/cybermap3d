@@ -34,4 +34,4 @@ def scanner_reseau(plage_ip):
 
 # Trouver ta plage IP
 # La plupart des box françaises utilisent 192.168.1.0/24
-scanner_reseau("192.168.1.173")
+scanner_reseau("192.168.1.0/24") 

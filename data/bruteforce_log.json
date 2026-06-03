@@ -1,0 +1,17 @@
+{
+    "cible": "localhost:2222",
+    "tentatives": 80,
+    "duree": 16.062967777252197,
+    "succes": [
+        {
+            "utilisateur": "root",
+            "mot_de_passe": "toor",
+            "heure": "13:47:20"
+        },
+        {
+            "utilisateur": "admin",
+            "mot_de_passe": "admin",
+            "heure": "13:47:24"
+        }
+    ]
+}

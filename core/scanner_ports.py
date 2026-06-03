@@ -57,4 +57,4 @@ def scanner_ports(plage_ip):
         json.dump(machines, f, indent=4)
     print("💾 Résultats sauvegardés dans reseau.json !")
 
-scanner_ports("192.168.1.173")
+scanner_ports("192.168.1.0/24")
