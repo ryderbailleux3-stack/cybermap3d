@@ -28,7 +28,7 @@ et la visualise en temps réel dans un environnement 3D interactif.
 
 1. Cloner le dépôt
 2. Lancer le serveur local :
-3. Ouvrir `http://localhost:8000` dans le navigateur
+3. Ouvrir `http://ryderbailleux3-stack.giyhub.io/cybermap3d/accueil.html` dans le navigateur
 4. Cliquer sur **"Lancer l'attaque"**
 
 ## 👤 Auteur
